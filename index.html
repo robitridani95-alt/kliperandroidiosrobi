@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>POTONG/20 — Satu link YouTube → 20 klip siap unggah</title>
+<meta name="theme-color" content="#0d0d0b"/>
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
+<meta name="description" content="Tempel link YouTube, susun 20 potongan di timeline, pratinjau masing-masing, lalu eksekusi jadi 20 file MP4 vertikal siap unggah dari Android, iOS, atau PC."/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230d0d0b'/%3E%3Crect x='8' y='26' width='34' height='12' fill='%23ffd400'/%3E%3Ctext x='12' y='36' font-family='monospace' font-weight='bold' font-size='11' fill='%230d0d0b'%3E20%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<style>
+/* ============ POTONG/20 — identitas: lembar panggilan ruang potong ============ */
+:root{
+  --bg:#0d0d0b; --panel:#141410; --deep:#0a0a08;
+  --line:#282820; --line2:#1c1c15;
+  --ink:#f1eee2; --dim:#9b9884; --dim2:#6e6c5d;
+  --acc:#ffd400; --acc-ink:#141204; --rec:#ff4530;
+  --mono:'Space Mono',ui-monospace,monospace;
+  --sans:'Archivo',sans-serif; --disp:'Archivo Black',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+::selection{background:var(--acc);color:var(--acc-ink)}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:var(--mono);color:var(--ink);background:var(--deep);border:1px solid var(--line);padding:11px 12px;font-size:16px;border-radius:0;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.mono{font-family:var(--mono)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+svg.lucide{width:16px;height:16px;stroke-width:2}
+
+/* ── topbar ── */
+.topbar{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(13,13,11,.92);backdrop-filter:blur(8px);z-index:50}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{font-family:var(--disp);font-size:19px;letter-spacing:.02em}
+.logo em{font-style:normal;color:var(--acc)}
+.badge{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--dim);display:flex;align-items:center;gap:8px}
+.badge i.dot{width:7px;height:7px;background:var(--acc);border-radius:50%;display:inline-block;animation:blink 2.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+#btn-reset{background:none;border:1px solid var(--line);color:var(--dim);padding:7px 10px;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px}
+#btn-reset:hover{border-color:var(--acc);color:var(--acc)}
+#btn-reset.arm{border-color:var(--rec);color:var(--rec)}
+
+/* ── hero ── */
+#hero{padding:72px 0 44px;border-bottom:1px solid var(--line);transition:padding .35s ease}
+#hero.compact{padding:26px 0 22px}
+#hero.compact .kicker,#hero.compact h1,#hero.compact .sub,#hero.compact .steps{display:none}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--dim);margin-bottom:20px}
+.kicker b{color:var(--acc);font-weight:400}
+h1{font-family:var(--disp);font-size:clamp(42px,8.4vw,108px);line-height:.98;letter-spacing:-.01em;text-transform:uppercase}
+h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .12em}
+.sub{max-width:640px;color:var(--dim);margin:22px 0 30px;font-size:16px}
+.sub b{color:var(--ink);font-weight:600}
+.linkbar{display:flex;gap:10px;max-width:760px}
+.linkbar input{flex:1;font-size:16px;padding:15px 14px}
+.linkbar input::placeholder{color:var(--dim2)}
+#link-err{display:none;color:var(--rec);font-family:var(--mono);font-size:12px;margin-top:10px}
+.btn-acc{background:var(--acc);color:var(--acc-ink);border:0;font-family:var(--sans);font-weight:700;letter-spacing:.09em;text-transform:uppercase;font-size:13px;padding:0 24px;display:inline-flex;align-items:center;gap:9px;white-space:nowrap}
+.btn-acc:hover{background:#ffe252}
+.btn-acc:active{transform:translateY(1px)}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink);font-family:var(--mono);font-size:12px;letter-spacing:.05em;padding:11px 16px;display:inline-flex;align-items:center;gap:8px}
+.btn-ghost:hover{border-color:var(--acc);color:var(--acc)}
+.steps{display:flex;gap:0;margin-top:40px;flex-wrap:wrap}
+.step{flex:1;min-width:220px;border-left:1px solid var(--line);padding:4px 20px 4px 16px;margin-top:8px}
+.step .n{font-family:var(--mono);color:var(--acc);font-size:12px}
+.step .t{font-size:13.5px;color:var(--dim);margin-top:4px}
+.step .t b{color:var(--ink);font-weight:600}
+
+/* ── section kerangka ── */
+#main{display:none}
+.sec{padding:52px 0 8px}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.reveal.on{opacity:1;transform:none}
+.sec-h{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.sec-no{font-family:var(--mono);color:var(--acc);font-size:13px}
+.sec-h h2{font-family:var(--disp);font-size:clamp(19px,2.6vw,26px);text-transform:uppercase;letter-spacing:.01em}
+.sec-line{flex:1;height:1px;background:var(--line);min-width:40px}
+.sec-note{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.04em}
+
+/* ── 01 sumber ── */
+.src-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:30px}
+.playerbox{position:relative;aspect-ratio:16/9;background:#000;border:1px solid var(--line)}
+#ytmount,#ytmount iframe{width:100%;height:100%;display:block}
+#playermsg{position:absolute;inset:0;display:none;z-index:2;background:#0a0a08;overflow:auto}
+#playermsg .pm-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.2;filter:blur(3px)}
+#playermsg .pm-body{position:relative;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:clamp(14px,3vw,30px)}
+#pm-title{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--acc)}
+#pm-text{font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--ink);white-space:pre-line}
+.pm-act{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.pm-act a.btn-acc{text-decoration:none;padding:11px 16px}
+#v-open{display:inline-block;font-family:var(--mono);font-size:11.5px;color:var(--acc);text-decoration:none;border-bottom:1px solid var(--line);margin:-12px 0 18px}
+#v-open:hover{border-color:var(--acc)}
+.durrow input.need{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+#recbadge{position:absolute;top:10px;left:10px;display:none;align-items:center;gap:8px;background:rgba(10,10,8,.82);border:1px solid var(--line);padding:6px 11px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;pointer-events:none;z-index:3}
+#recbadge i{width:8px;height:8px;border-radius:50%;background:var(--rec);animation:blink 1s infinite}
+.meta .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--dim2);text-transform:uppercase;margin-bottom:6px}
+#v-title{font-weight:700;font-size:19px;line-height:1.3;margin-bottom:4px}
+#v-author{font-family:var(--mono);font-size:12px;color:var(--dim);margin-bottom:22px}
+.durrow{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.durrow input{width:110px;font-size:16px}
+.durrow .unit{font-family:var(--mono);font-size:12px;color:var(--dim)}
+#dur-hint{font-family:var(--mono);font-size:11px;color:var(--dim2);margin-top:10px;line-height:1.6}
+
+/* ── 02 parameter ── */
+.prow{display:grid;grid-template-columns:210px 1fr;gap:14px;align-items:center;border-top:1px solid var(--line2);padding:13px 0}
+.prow:last-of-type{border-bottom:1px solid var(--line2)}
+.plabel{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.pctrl{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.pctrl input[type=number]{width:82px;text-align:center}
+.pctrl input[type=text]{flex:1;min-width:200px}
+.pctrl select{padding:10px 8px}
+.unit{font-family:var(--mono);font-size:11.5px;color:var(--dim2)}
+.rangejoin{font-family:var(--mono);font-size:11.5px;color:var(--dim2)}
+.seg{display:inline-flex;border:1px solid var(--line);background:var(--deep)}
+.seg button{background:transparent;border:0;border-right:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:10px 14px;transition:background .15s,color .15s}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--acc);color:var(--acc-ink);font-weight:700}
+#fmt-note,#cam-note{font-family:var(--mono);font-size:11px;color:var(--dim2);width:100%;margin-top:6px;line-height:1.6}
+#row-zoom.off{opacity:.4;pointer-events:none}
+.tools{display:flex;gap:10px;margin:18px 0 6px;flex-wrap:wrap}
+.icobtn{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--line);color:var(--ink);padding:0}
+.icobtn:hover{border-color:var(--acc);color:var(--acc)}
+.icobtn.txt{width:auto;padding:0 9px;font-family:var(--mono);font-size:11px}
+#plan-warn{display:none;border:1px solid var(--acc);color:var(--acc);font-family:var(--mono);font-size:12px;line-height:1.6;padding:11px 14px;margin:16px 0 0;background:rgba(255,212,0,.05)}
+
+/* agregat */
+.agg{display:flex;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:26px}
+.agg div{flex:1;min-width:140px;padding:16px 18px;border-left:1px solid var(--line)}
+.agg div:first-child{border-left:0;padding-left:0}
+.agg .k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--dim2);text-transform:uppercase}
+.agg .v{font-family:var(--mono);font-weight:700;font-size:clamp(22px,3vw,32px);margin-top:2px}
+.agg .v em{font-style:normal;color:var(--acc)}
+
+/* ── 03 timeline ── */
+.tl-frame{border:1px solid var(--line);background:var(--panel)}
+#ruler{position:relative;height:22px;border-bottom:1px solid var(--line2)}
+#ruler span{position:absolute;top:4px;font-family:var(--mono);font-size:9.5px;color:var(--dim2);transform:translateX(-50%);white-space:nowrap}
+#ruler span:first-child{transform:none;padding-left:6px}
+#ruler span:last-child{transform:translateX(-100%);padding-right:6px}
+#track{position:relative;height:92px;user-select:none;-webkit-user-select:none;
+  background-image:linear-gradient(90deg,var(--line2) 1px,transparent 1px);background-size:5% 100%}
+.tl-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--dim2);font-family:var(--mono);font-size:12px}
+.clip-block{position:absolute;top:12px;bottom:12px;background:var(--acc);color:var(--acc-ink);border-radius:2px;
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:11px;
+  cursor:grab;touch-action:none;min-width:8px;transition:left .18s ease,width .18s ease,transform .12s ease,box-shadow .12s ease}
+.clip-block.drag{transition:transform .12s ease;cursor:grabbing;transform:scaleY(1.12);box-shadow:0 0 0 1px var(--acc),0 10px 22px rgba(0,0,0,.55);z-index:4}
+.clip-block.active{outline:2px solid #fff;outline-offset:1px}
+.clip-block span{pointer-events:none;overflow:hidden;max-width:100%}
+#playhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;display:none;pointer-events:none;z-index:3}
+.tl-hint{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;border-top:1px solid var(--line2);font-family:var(--mono);font-size:10.5px;color:var(--dim2);flex-wrap:wrap}
+#btn-loop{border:0;background:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--acc)}
+#btn-loop.off{color:var(--dim2)}
+
+/* ── 04 cutting list ── */
+.list-tools{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+.l-head{display:grid;grid-template-columns:52px 168px 76px 1fr 236px;gap:12px;padding:0 2px 8px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--dim2);text-transform:uppercase;border-bottom:1px solid var(--line)}
+.clip-row{position:relative;display:grid;grid-template-columns:52px 168px 76px 1fr 236px;gap:12px;align-items:center;
+  border-bottom:1px solid var(--line2);padding:11px 2px;cursor:pointer;transition:background .15s}
+.clip-row:hover{background:#12120d}
+.clip-row.active{background:#181709;border-left:3px solid var(--acc);padding-left:11px}
+.c-no{font-family:var(--mono);font-weight:700;font-size:19px;color:var(--dim2)}
+.clip-row.active .c-no{color:var(--acc)}
+.c-tc{font-family:var(--mono);font-size:13.5px;display:flex;gap:7px;align-items:baseline;white-space:nowrap}
+.c-tc .arr{color:var(--dim2);font-size:11px}
+.c-tc .t-end{color:var(--dim)}
+.c-dur{font-family:var(--mono);font-size:11.5px;color:var(--dim);border:1px solid var(--line);text-align:center;padding:4px 0}
+.c-file{min-width:0}
+.fname{font-family:var(--mono);font-size:11.5px;color:var(--dim);display:block}
+.cap-input{width:100%;border:0;border-bottom:1px solid transparent;background:transparent;font-family:var(--mono);font-size:12.5px;color:var(--ink);padding:5px 0 3px;margin-top:2px}
+.cap-input::placeholder{color:var(--dim2)}
+.cap-input:focus{outline:none;border-bottom-color:var(--acc);background:var(--deep)}
+.c-act{display:flex;gap:6px;justify-content:flex-end;align-items:center}
+.c-prog{position:absolute;left:0;bottom:0;height:2px;background:var(--acc);width:0;display:block;font-style:normal}
+.empty{padding:40px 0;text-align:center;color:var(--dim2);font-family:var(--mono);font-size:12.5px}
+
+/* ── 05 ekspor ── */
+.tabs{display:flex;gap:0;border:1px solid var(--line);margin-bottom:24px;flex-wrap:wrap}
+.tabs button{flex:1;min-width:150px;background:transparent;border:0;border-right:1px solid var(--line);color:var(--dim);padding:14px 10px;font-family:var(--mono);font-size:12px;letter-spacing:.06em}
+.tabs button:last-child{border-right:0}
+.tabs button small{display:block;font-size:10px;color:var(--dim2);margin-top:3px;letter-spacing:.02em}
+.tabs button.on{background:var(--acc);color:var(--acc-ink)}
+.tabs button.on small{color:#4d4300}
+.exp-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:28px;align-items:start}
+#exp-steps{list-style:none;counter-reset:s}
+#exp-steps li{counter-increment:s;border-top:1px solid var(--line2);padding:14px 0 14px 40px;position:relative;font-size:14px;color:var(--dim)}
+#exp-steps li b{color:var(--ink);font-weight:600}
+#exp-steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:14px;font-family:var(--mono);color:var(--acc);font-size:13px}
+#exp-steps code{font-family:var(--mono);font-size:12px;color:var(--acc);background:var(--deep);border:1px solid var(--line);padding:1px 5px}
+.codewrap{border:1px solid var(--line);background:var(--deep);position:relative}
+.codewrap .codebar{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:9px 12px}
+.codebar span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dim2)}
+#scriptbox{display:block;padding:16px;font-family:var(--mono);font-size:11.5px;line-height:1.7;white-space:pre;overflow:auto;max-height:480px;color:#cfcbb8}
+.exp-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+
+/* ── footer / toast ── */
+footer{border-top:1px solid var(--line);margin-top:64px;padding:26px 0 40px}
+footer p{font-family:var(--mono);font-size:11px;color:var(--dim2);line-height:1.8;max-width:760px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);display:flex;align-items:center;gap:10px;
+  background:#191810;border:1px solid var(--acc);color:var(--ink);padding:12px 18px;font-family:var(--mono);font-size:12.5px;
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:99;max-width:90vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#toast svg{color:var(--acc)}
+
+/* ── font · judul · subtitle · logo ── */
+.pctrl select#sel-font{min-width:260px}
+.pctrl input[type=text]#in-titletxt{flex:1;min-width:200px}
+.thumb{width:40px;height:40px;object-fit:contain;background:#000;border:1px solid var(--line)}
+label.btn-ghost{cursor:pointer}
+.fxprev-wrap{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;width:100%}
+#fxprev{position:relative;overflow:hidden;flex:none;border:1px solid var(--line);background:linear-gradient(160deg,#2a2438,#0d0d14 60%,#1d1a0a)}
+#fxbg{position:absolute;inset:0;background-size:cover;background-position:center}
+#fxprev::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.05) 40%,rgba(0,0,0,.4));pointer-events:none}
+#fx-brand,#fx-title,#fx-sub{position:absolute;left:0;right:0;text-align:center;color:#fff;line-height:1.22;padding:0 7%;pointer-events:none;z-index:2}
+#fx-title{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#fx-brand,#fx-title,#fx-sub span{paint-order:stroke fill}
+#fx-sub span{display:inline-block}
+#fx-logo{position:absolute;left:0;top:0;z-index:3;display:block;height:auto;will-change:transform}
+#fx-note{font-family:var(--mono);font-size:11px;color:var(--dim2);line-height:1.7;flex:1;min-width:200px}
+/* ── responsif ── */
+@media (max-width:900px){
+  .src-grid,.exp-grid{grid-template-columns:1fr}
+  .l-head{display:none}
+  .clip-row{grid-template-columns:40px 1fr auto auto;grid-template-areas:"no tc dur act" "file file file file";row-gap:8px}
+  .c-no{grid-area:no}.c-tc{grid-area:tc}.c-dur{grid-area:dur}.c-file{grid-area:file}.c-act{grid-area:act}
+  .clip-row.active{border-left-width:3px}
+  .prow{grid-template-columns:1fr;gap:8px;padding:12px 0}
+  #track{height:78px}
+}
+@media (max-width:560px){
+  .linkbar{flex-direction:column}
+  .btn-acc{padding:15px 24px;justify-content:center}
+  .agg div{min-width:46%;padding-left:0;border-left:0;border-top:1px solid var(--line2)}
+  .agg{border-top:0}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo">POTONG<em>/20</em></div>
+    <div class="badge"><i class="dot"></i><span>100% LOKAL · TANPA SERVER</span>
+      <button id="btn-reset" title="Hapus data & mulai baru"><i data-lucide="trash-2"></i><span id="reset-lbl">RESET</span></button>
+    </div>
+  </div>
+</header>
+
+<section id="hero">
+  <div class="wrap">
+    <div class="kicker">STUDIO POTONG KLIP — <b>SATU LINK YOUTUBE MASUK, DUA PULUH KLIP KELUAR</b></div>
+    <h1>Satu link,<br/><mark>dua puluh klip</mark><br/>siap unggah.</h1>
+    <p class="sub">Tempel tautan YouTube — susun <b>20 potongan</b> di timeline, pratinjau masing-masing langsung dari sumbernya, lalu eksekusi jadi <b>20 file MP4 vertikal</b> dari Android, iOS, atau PC. Semua perencanaan terjadi di perangkatmu.</p>
+    <div class="linkbar">
+      <input id="in-link" type="url" placeholder="https://www.youtube.com/watch?v=…  atau  https://youtu.be/…" autocomplete="off" spellcheck="false"/>
+      <button class="btn-acc" id="btn-load">Muat video <i data-lucide="arrow-right"></i></button>
+    </div>
+    <div id="link-err"></div>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><div class="t"><b>Tempel link</b> — judul, channel & durasi terbaca otomatis.</div></div>
+      <div class="step"><div class="n">02</div><div class="t"><b>Susun 20 potongan</b> — geser blok di timeline, ketuk untuk pratinjau.</div></div>
+      <div class="step"><div class="n">03</div><div class="t"><b>Salin satu script</b> — jalankan di Termux / iSH / PC, dapat 20 file MP4.</div></div>
+    </div>
+  </div>
+</section>
+
+<main id="main" class="wrap">
+
+  <!-- 01 SUMBER -->
+  <section class="sec reveal">
+    <div class="sec-h"><span class="sec-no">01</span><h2>Sumber</h2><span class="sec-line"></span><span class="sec-note" id="v-id"></span></div>
+    <div class="src-grid">
+      <div class="playerbox" id="playerbox">
+        <div id="ytmount"></div>
+        <div id="recbadge"><i></i><span id="rec-txt">PRATINJAU</span></div>
+        <div id="playermsg"><div class="pm-bg" id="pm-bg"></div>
+          <div class="pm-body"><div id="pm-title"></div><p id="pm-text"></p>
+            <div class="pm-act"><a class="btn-acc" id="pm-yt" target="_blank" rel="noopener">Tonton di YouTube <i data-lucide="external-link"></i></a>
+              <button class="btn-ghost" id="pm-retry" type="button"><i data-lucide="refresh-cw"></i> Coba lagi</button></div></div></div>
+      </div>
+      <div class="meta">
+        <div class="lbl">Judul</div>
+        <div id="v-title">—</div>
+        <div id="v-author">—</div>
+        <a id="v-open" target="_blank" rel="noopener" style="display:none">buka di YouTube ↗</a>
+        <div class="lbl">Durasi video (detik)</div>
+        <div class="durrow">
+          <input id="in-duration" type="number" min="1" max="200000" placeholder="0"/>
+          <span class="unit">dtk — terisi otomatis; boleh dikoreksi manual</span>
+        </div>
+        <p id="dur-hint">Durasi menentukan sebaran potongan. Ubah nilainya, rencana langsung tersusun ulang.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 PARAMETER -->
+  <section class="sec reveal">
+    <div class="sec-h"><span class="sec-no">02</span><h2>Parameter potong</h2><span class="sec-line"></span><span class="sec-note">berubah → rencana tersusun ulang seketika</span></div>
+    <div class="prow"><div class="plabel">Jumlah klip</div>
+      <div class="pctrl"><input id="p-count" type="number" min="5" max="60" value="20"/><span class="unit">klip — default 20</span></div></div>
+    <div class="prow"><div class="plabel">Durasi tiap klip</div>
+      <div class="pctrl"><input id="p-dmin" type="number" min="5" max="600" value="30"/><span class="rangejoin">s/d</span><input id="p-dmax" type="number" min="5" max="600" value="45"/><span class="unit">detik (diambil acak dalam rentang)</span></div></div>
+    <div class="prow"><div class="plabel">Lewati intro / outro</div>
+      <div class="pctrl"><input id="p-s0" type="number" min="0" max="7200" value="5"/><span class="unit">dtk awal</span><input id="p-s1" type="number" min="0" max="7200" value="10"/><span class="unit">dtk akhir</span></div></div>
+    <div class="prow"><div class="plabel">Mode sebaran</div>
+      <div class="pctrl">
+        <div class="seg" id="seg-mode">
+          <button data-mode="merata" class="on">MERATA</button>
+          <button data-mode="awal">AWAL PADAT</button>
+          <button data-mode="acak">ACAK</button>
+        </div>
+        <button class="icobtn" id="btn-dice" title="Acak ulang susunan"><i data-lucide="dices"></i></button>
+        <button class="icobtn" id="btn-replan" title="Susun ulang rencana"><i data-lucide="refresh-cw"></i></button>
+      </div></div>
+    <div class="prow"><div class="plabel">Format keluaran</div>
+      <div class="pctrl">
+        <div class="seg" id="seg-fmt">
+          <button data-fmt="blur" class="on">9:16 BLUR</button>
+          <button data-fmt="crop">9:16 POTONG</button>
+          <button data-fmt="asli">16:9 ASLI</button>
+        </div>
+        <span id="fmt-note">9:16 · video di tengah, latar blur — paling aman untuk Shorts / Reels / TikTok.</span>
+      </div></div>
+    <div class="prow"><div class="plabel">Kamera otomatis</div>
+      <div class="pctrl">
+        <div class="seg" id="seg-cam">
+          <button data-cam="1" class="on">ZOOM WAJAH SAAT BICARA</button>
+          <button data-cam="0">MATI</button>
+        </div>
+        <span id="cam-note"></span>
+      </div></div>
+    <div class="prow" id="row-zoom"><div class="plabel">Zoom &amp; suara</div>
+      <div class="pctrl">
+        <div class="seg" id="seg-zoom">
+          <button data-z="1.4">HALUS 1,4×</button>
+          <button data-z="1.8" class="on">SEDANG 1,8×</button>
+          <button data-z="2.4">DEKAT 2,4×</button>
+        </div>
+        <select id="sel-sens">
+          <option value="0.5">deteksi suara: ketat (abaikan bising)</option>
+          <option value="0.35" selected>deteksi suara: normal</option>
+          <option value="0.22">deteksi suara: peka (suara pelan)</option>
+        </select>
+      </div></div>
+    <div class="prow"><div class="plabel">Kualitas (CRF)</div>
+      <div class="pctrl">
+        <select id="sel-crf">
+          <option value="18">18 — tinggi, file besar</option>
+          <option value="20" selected>20 — seimbang (rekomendasi)</option>
+          <option value="23">23 — hemat</option>
+          <option value="26">26 — ringan</option>
+        </select>
+      </div></div>
+    <div class="prow"><div class="plabel">Nama akun (opsional)</div>
+      <div class="pctrl"><input id="in-brand" type="text" maxlength="28" placeholder="mis. @studiodakwah — ditulis di atas video & jadi nama file"/></div></div>
+    <div class="prow"><div class="plabel">Hashtag bawaan</div>
+      <div class="pctrl"><input id="in-tags" type="text" placeholder="#fyp #viral #shorts"/></div></div>
+
+    <div class="prow"><div class="plabel">Font teks</div>
+      <div class="pctrl"><select id="sel-font"></select>
+        <span class="unit" id="font-note">dipakai untuk judul, subtitle &amp; nama akun — diunduh otomatis oleh script</span></div></div>
+    <div class="prow"><div class="plabel">Judul di video</div>
+      <div class="pctrl">
+        <div class="seg" id="seg-title">
+          <button data-tm="off">MATI</button><button data-tm="judul" class="on">JUDUL VIDEO</button>
+          <button data-tm="caption">CAPTION KLIP</button><button data-tm="custom">TEKS SENDIRI</button></div>
+        <div class="seg" id="seg-tdur"><button data-td="4" class="on">4 DTK AWAL</button><button data-td="0">SEPANJANG KLIP</button></div>
+        <input id="in-titletxt" type="text" maxlength="90" placeholder="Tulis judul sendiri…" style="display:none"/>
+      </div></div>
+    <div class="prow"><div class="plabel">Subtitle otomatis</div>
+      <div class="pctrl">
+        <div class="seg" id="seg-sub"><button data-sub="1" class="on">AKTIF</button><button data-sub="0">MATI</button></div>
+        <select id="sel-sublang"><option value="id">bahasa: Indonesia</option><option value="en">bahasa: English</option><option value="auto">bahasa: otomatis</option></select>
+        <div class="seg" id="seg-substyle"><button data-ss="putih" class="on">PUTIH</button><button data-ss="kuning">KUNING</button><button data-ss="kotak">KOTAK</button></div>
+        <div class="seg" id="seg-subpos"><button data-sp="bawah" class="on">BAWAH</button><button data-sp="tengah">TENGAH</button></div>
+        <span id="sub-note">Diambil dari caption YouTube (ringan, jalan di semua perangkat), dipotong &amp; disinkronkan ke tiap klip. Video tanpa caption → dicoba lewat Whisper bila terpasang (PC); jika tidak, klip dibuat tanpa subtitle.</span>
+      </div></div>
+    <div class="prow"><div class="plabel">Logo bergerak</div>
+      <div class="pctrl">
+        <label class="btn-ghost" for="in-logo"><i data-lucide="image-plus"></i> Pilih logo</label>
+        <input id="in-logo" type="file" accept="image/*" hidden/>
+        <img id="logo-thumb" class="thumb" alt="" style="display:none"/>
+        <button class="icobtn" id="btn-logo-del" type="button" title="Hapus logo" style="display:none"><i data-lucide="x"></i></button>
+        <div class="seg" id="seg-logomove">
+          <button data-lm="float" class="on">MELAYANG</button><button data-lm="bounce">PANTUL</button>
+          <button data-lm="corner">PINDAH POJOK</button><button data-lm="diam">DIAM</button></div>
+        <div class="seg" id="seg-logosize"><button data-ls="0.12">KECIL</button><button data-ls="0.18" class="on">SEDANG</button><button data-ls="0.26">BESAR</button></div>
+        <select id="sel-logoop"><option value="1">opasitas 100%</option><option value="0.9" selected>opasitas 90%</option><option value="0.65">opasitas 65%</option></select>
+        <span id="logo-note"></span>
+      </div></div>
+    <div class="prow"><div class="plabel">Pratinjau tampilan</div>
+      <div class="pctrl"><div class="fxprev-wrap">
+        <div id="fxprev"><div id="fxbg"></div><div id="fx-brand"></div><div id="fx-title"></div><div id="fx-sub"><span></span></div><img id="fx-logo" alt=""/></div>
+        <div id="fx-note">Simulasi langsung: font, judul, subtitle &amp; gerak logo mengikuti pilihanmu. Hasil akhir dirender oleh script di perangkatmu dengan rumus gerak yang sama.</div>
+      </div></div></div>
+
+    <div id="plan-warn"></div>
+    <div class="agg">
+      <div><div class="k">Klip</div><div class="v" id="ag-count">0</div></div>
+      <div><div class="k">Durasi dipakai</div><div class="v" id="ag-used">0:00</div></div>
+      <div><div class="k">Porsi video</div><div class="v"><em id="ag-pct">—</em></div></div>
+      <div><div class="k">Rata-rata klip</div><div class="v" id="ag-avg">—</div></div>
+    </div>
+  </section>
+
+  <!-- 03 TIMELINE -->
+  <section class="sec reveal">
+    <div class="sec-h"><span class="sec-no">03</span><h2>Timeline potong</h2><span class="sec-line"></span>
+      <button id="btn-loop">PUTAR ULANG KLIP: AKTIF</button></div>
+    <div class="tl-frame">
+      <div id="ruler"></div>
+      <div id="track"></div>
+      <div class="tl-hint">
+        <span>SERET blok untuk menggeser · KETUK blok untuk pratinjau · ketuk area kosong untuk melompati video</span>
+        <span id="tl-count"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 CUTTING LIST -->
+  <section class="sec reveal">
+    <div class="sec-h"><span class="sec-no">04</span><h2>Cutting list</h2><span class="sec-line"></span><span class="sec-note">ketuk baris untuk pratinjau · caption ikut terbawa saat ekspor</span></div>
+    <div class="list-tools">
+      <button class="btn-ghost" id="btn-copyall"><i data-lucide="copy"></i> Salin script lengkap</button>
+      <button class="btn-ghost" id="btn-dl-sh"><i data-lucide="download"></i> potong20.sh</button>
+      <button class="btn-ghost" id="btn-dl-py"><i data-lucide="download"></i> zoomwajah.py</button>
+      <button class="btn-ghost" id="btn-dl-fx"><i data-lucide="download"></i> efek.py</button>
+      <button class="btn-ghost" id="btn-dl-cap"><i data-lucide="download"></i> captions.txt</button>
+      <button class="btn-ghost" id="btn-dl-json"><i data-lucide="download"></i> cutlist.json</button>
+    </div>
+    <div class="l-head"><span>NO</span><span>TIMECODE</span><span>DURASI</span><span>BERKAS & CAPTION</span><span style="text-align:right">GESER · PUTAR · SALIN</span></div>
+    <div id="cliplist"></div>
+  </section>
+
+  <!-- 05 EKSEKUSI -->
+  <section class="sec reveal">
+    <div class="sec-h"><span class="sec-no">05</span><h2>Eksekusi di perangkatmu</h2><span class="sec-line"></span><span class="sec-note">pilihan di sini mengubah resolusi & preset script</span></div>
+    <div class="tabs" id="seg-plat">
+      <button data-plat="termux" class="on">TERMUX<small>Android — tercepat</small></button>
+      <button data-plat="ish">iSH<small>iPhone / iPad — gratis</small></button>
+      <button data-plat="pc">PC · MAC<small>Linux / macOS / Windows</small></button>
+    </div>
+    <div class="exp-grid">
+      <ol id="exp-steps"></ol>
+      <div>
+        <div class="codewrap">
+          <div class="codebar"><span>potong20.sh — dibuat otomatis dari cutting list</span>
+            <button class="icobtn" id="btn-exp-copy" title="Salin script"><i data-lucide="copy"></i></button></div>
+          <pre id="scriptbox"></pre>
+        </div>
+        <div class="exp-actions">
+          <button class="btn-acc" id="btn-exp-dl">Unduh potong20.sh <i data-lucide="download"></i></button>
+          <button class="btn-ghost" id="btn-exp-py"><i data-lucide="download"></i> zoomwajah.py</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>POTONG/20 berjalan sepenuhnya di peramban — tidak ada unggahan, akun, atau server perantara. Peramban tidak diizinkan mengunduh video YouTube secara langsung, karena itu tahap akhir (unduh sumber + potong) dieksekusi sekali lewat script di perangkatmu. Zoom wajah saat bicara juga berjalan lokal di perangkatmu saat ekspor (deteksi suara + deteksi wajah OpenCV). Gunakan untuk video milikmu sendiri atau yang telah kamu dapatkan izinnya.</p>
+  </footer>
+</main>
+
+<div id="toast"><i data-lucide="check"></i><span id="toast-msg"></span></div>
+
+<script type="text/plain" id="fx-src">
+#!/usr/bin/env python3
+# POTONG/20 - efek teks: judul, subtitle otomatis, nama akun.
+# Dua tahap:
+#   python3 efek.py prep --lang id --windows "MULAI:DURASI,..." [--src sumber.mp4]
+#       -> membuat transkrip.json (dari caption YouTube *.vtt, atau Whisper bila terpasang)
+#   python3 efek.py clip --tag 01 --start S --dur D --font FILE --ow W --oh H --vert 1 ...
+#       -> mencetak potongan filtergraph ffmpeg (drawtext) ke stdout
+# Kegagalan apa pun tidak fatal: hasil kosong = klip dibuat tanpa efek itu.
+import sys, os, re, json, glob, argparse, subprocess, textwrap
+
+FXDIR = ".fx"
+TRANS = "transkrip.json"
+
+
+# ---------------------------------------------------------------- transkrip
+def ts(s):
+    s = s.strip().replace(",", ".")
+    p = s.split(":")
+    v = 0.0
+    for x in p:
+        v = v * 60 + float(x)
+    return v
+
+
+def parse_vtt(path):
+    """VTT -> [{s,e,t}], membuang tag <c>, baris berulang (caption otomatis YouTube bergulir)."""
+    raw = open(path, encoding="utf-8", errors="ignore").read().replace("\r", "")
+    cues = []
+    for block in re.split(r"\n\n+", raw):
+        lines = [l for l in block.split("\n") if l.strip()]
+        for k, l in enumerate(lines):
+            m = re.match(r"\s*([\d:.,]+)\s+-->\s+([\d:.,]+)", l)
+            if m:
+                body = []
+                for t in lines[k + 1:]:
+                    t = re.sub(r"<[^>]+>", "", t)
+                    t = re.sub(r"&nbsp;", " ", t)
+                    t = t.replace("&amp;", "&").replace("&gt;", ">").replace("&lt;", "<")
+                    t = re.sub(r"\s+", " ", t).strip()
+                    if t:
+                        body.append(t)
+                cues.append((ts(m.group(1)), ts(m.group(2)), body))
+                break
+    ev = []
+    seen_recent = []
+    for s, e, body in cues:
+        for line in body:
+            if line in seen_recent:
+                continue
+            seen_recent.append(line)
+            seen_recent = seen_recent[-6:]
+            ev.append({"s": s, "e": e, "t": line})
+    # tiap baris tampil sampai baris berikutnya muncul (maks 6 dtk)
+    for i, x in enumerate(ev):
+        nxt = ev[i + 1]["s"] if i + 1 < len(ev) else x["e"]
+        x["e"] = max(x["s"] + 0.6, min(nxt, x["s"] + 6.0))
+    return ev
+
+
+def pick_vtt(lang):
+    files = sorted(glob.glob("sumber*.vtt"))
+    if not files:
+        return None
+    order = {"id": ["id", "id-orig", "en", "en-orig"], "en": ["en", "en-orig", "id", "id-orig"]}.get(
+        lang, ["id", "id-orig", "en", "en-orig"])
+    for code in order:
+        for f in files:
+            if f.endswith("." + code + ".vtt"):
+                return f
+    return files[0]
+
+
+def whisper_windows(src, windows, lang):
+    try:
+        from faster_whisper import WhisperModel
+    except Exception:
+        return None
+    model = WhisperModel(os.environ.get("WHISPER_MODEL", "base"), compute_type="int8")
+    ev = []
+    for n, (s, d) in enumerate(windows):
+        wav = os.path.join(FXDIR, "w%02d.wav" % n)
+        subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", str(s), "-t", str(d), "-i", src,
+                        "-vn", "-ac", "1", "-ar", "16000", wav],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not os.path.isfile(wav):
+            continue
+        segs, _ = model.transcribe(wav, language=(None if lang == "auto" else lang), vad_filter=True)
+        for sg in segs:
+            t = re.sub(r"\s+", " ", sg.text).strip()
+            if t:
+                ev.append({"s": s + sg.start, "e": s + sg.end, "t": t})
+        try:
+            os.remove(wav)
+        except OSError:
+            pass
+    return ev
+
+
+def cmd_prep(a):
+    os.makedirs(FXDIR, exist_ok=True)
+    ev = None
+    v = pick_vtt(a.lang)
+    if v:
+        try:
+            ev = parse_vtt(v)
+            sys.stderr.write("[efek] subtitle dari caption YouTube: %s (%d baris)\n" % (v, len(ev)))
+        except Exception as e:
+            sys.stderr.write("[efek] caption gagal dibaca: %s\n" % e)
+    if not ev:
+        wins = []
+        for w in (a.windows or "").split(","):
+            if ":" in w:
+                x, y = w.split(":")
+                wins.append((float(x), float(y)))
+        sys.stderr.write("[efek] caption YouTube tidak ada - mencoba Whisper...\n")
+        ev = whisper_windows(a.src, wins, a.lang)
+        if ev is None:
+            sys.stderr.write("[efek] Whisper tidak terpasang (pip install faster-whisper) - klip tanpa subtitle.\n")
+            ev = []
+    json.dump(ev, open(TRANS, "w", encoding="utf-8"), ensure_ascii=False)
+
+
+# ---------------------------------------------------------------- filter
+def wrap_words(text, width):
+    return textwrap.wrap(text, width=max(8, width), break_long_words=False) or [text]
+
+
+def chunks(text, maxc):
+    """Pecah teks jadi potongan 1 baris <= maxc karakter."""
+    words, out, cur = text.split(), [], ""
+    for w in words:
+        if cur and len(cur) + 1 + len(w) > maxc:
+            out.append(cur)
+            cur = w
+        else:
+            cur = (cur + " " + w).strip()
+    if cur:
+        out.append(cur)
+    return out
+
+
+def tfile(tag, name, text):
+    p = os.path.join(FXDIR, "%s_%s.txt" % (tag, name))
+    with open(p, "w", encoding="utf-8") as f:
+        f.write(text)
+    return p
+
+
+def dtext(font, path, fs, y, extra, enable=None, alpha=None, color="white"):
+    s = ("drawtext=fontfile='%s':textfile='%s':fontcolor=%s:fontsize=%d:x=(w-text_w)/2:y=%s"
+         % (font, path, color, fs, y))
+    if extra:
+        s += ":" + extra
+    if enable:
+        s += ":enable='%s'" % enable
+    if alpha:
+        s += ":alpha='%s'" % alpha
+    return s
+
+
+def cmd_clip(a):
+    parts = []
+    font = a.font
+    if not font or not os.path.isfile(font):
+        return ""
+    os.makedirs(FXDIR, exist_ok=True)
+    vert = a.vert == 1
+    ref = a.ow if vert else a.oh
+    cpl = int(a.ow * 0.86 / (ref * 0.058 * 0.56)) if vert else int(a.ow * 0.8 / (ref * 0.058 * 0.56))
+
+    # nama akun (atas)
+    if a.brand.strip():
+        fs = int(round(ref * 0.04))
+        y = int(round(a.oh * (0.05 if vert else 0.05)))
+        p = tfile(a.tag, "brand", a.brand.strip())
+        parts.append(dtext(font, p, fs, y, "borderw=3:bordercolor=black@0.65"))
+
+    # judul
+    if a.title.strip():
+        fs = int(round(ref * 0.064))
+        lines = wrap_words(a.title.strip(), int(a.ow * 0.86 / (fs * 0.56)))[:3]
+        y0 = int(round(a.oh * (0.115 if vert else 0.14)))
+        tend = a.titlesec
+        en = ("lt(t,%s)" % tend) if tend > 0 else None
+        al = ("if(lt(t,0.4),t/0.4,if(gt(t,%s-0.4),(%s-t)/0.4,1))" % (tend, tend)) if tend > 0 else None
+        for k, ln in enumerate(lines):
+            p = tfile(a.tag, "title%d" % k, ln)
+            parts.append(dtext(font, p, fs, y0 + int(k * fs * 1.28),
+                               "borderw=%d:bordercolor=black@0.8" % max(3, int(fs * 0.09)), en, al))
+
+    # subtitle otomatis
+    if a.sub:
+        try:
+            ev = json.load(open(TRANS, encoding="utf-8"))
+        except Exception:
+            ev = []
+        fs = int(round(ref * (0.056 if vert else 0.052)))
+        maxc = max(10, int(a.ow * 0.84 / (fs * 0.55)))
+        ypos = {"bawah": 0.70 if vert else 0.82, "tengah": 0.5 if vert else 0.5}.get(a.subpos, 0.7)
+        y = int(round(a.oh * ypos))
+        color = {"kuning": "0xFFD400"}.get(a.substyle, "white")
+        if a.substyle == "kotak":
+            extra = "box=1:boxcolor=black@0.6:boxborderw=%d" % int(fs * 0.3)
+        else:
+            extra = "borderw=%d:bordercolor=black@0.9" % max(3, int(fs * 0.09))
+        end = a.start + a.dur
+        n = 0
+        for sg in ev:
+            if sg["e"] <= a.start or sg["s"] >= end:
+                continue
+            s0, e0 = max(sg["s"], a.start), min(sg["e"], end)
+            ch = chunks(sg["t"], maxc)
+            tot = sum(len(c) for c in ch) or 1
+            cur = s0
+            for c in ch:
+                dd = (e0 - s0) * len(c) / tot
+                t1, t2 = cur - a.start, cur + dd - a.start
+                cur += dd
+                if t2 - t1 < 0.15:
+                    continue
+                p = tfile(a.tag, "s%03d" % n, c)
+                n += 1
+                parts.append(dtext(font, p, fs, y, extra, "between(t,%.2f,%.2f)" % (t1, t2), None, color))
+        if n == 0:
+            sys.stderr.write("[efek] klip %s: tidak ada ucapan terdeteksi untuk subtitle.\n" % a.tag)
+    return ",".join(parts)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    sp = ap.add_subparsers(dest="cmd")
+    p = sp.add_parser("prep")
+    p.add_argument("--lang", default="id")
+    p.add_argument("--windows", default="")
+    p.add_argument("--src", default="sumber.mp4")
+    c = sp.add_parser("clip")
+    c.add_argument("--tag", default="00")
+    c.add_argument("--start", type=float, default=0)
+    c.add_argument("--dur", type=float, default=30)
+    c.add_argument("--font", default="")
+    c.add_argument("--ow", type=int, default=1080)
+    c.add_argument("--oh", type=int, default=1920)
+    c.add_argument("--vert", type=int, default=1)
+    c.add_argument("--title", default="")
+    c.add_argument("--titlesec", type=float, default=4)
+    c.add_argument("--brand", default="")
+    c.add_argument("--sub", type=int, default=0)
+    c.add_argument("--substyle", default="putih")
+    c.add_argument("--subpos", default="bawah")
+    a = ap.parse_args()
+    try:
+        if a.cmd == "prep":
+            cmd_prep(a)
+        elif a.cmd == "clip":
+            sys.stdout.write(cmd_clip(a))
+    except Exception as e:
+        sys.stderr.write("[efek] %s\n" % e)
+
+
+if __name__ == "__main__":
+    main()
+</script>
+
+<script type="text/plain" id="py-src">
+#!/usr/bin/env python3
+# POTONG/20 - kamera otomatis: zoom ke wajah saat subjek berbicara.
+# Pakai: python3 zoomwajah.py sumber.mp4 MULAI DURASI keluaran.mp4 [opsi]
+# Butuh: ffmpeg, numpy, opencv. Jika salah satu tidak ada -> keluar kode 2
+# (script utama otomatis memakai potongan biasa sebagai cadangan).
+import sys, os, argparse, subprocess
+
+try:
+    import numpy as np
+    import cv2
+except Exception:
+    sys.stderr.write("[zoomwajah] numpy/opencv belum terpasang - pakai potongan biasa.\n")
+    sys.exit(2)
+
+FPS = 30
+
+
+def probe(src):
+    r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0",
+                        "-show_entries", "stream=width,height", "-of", "csv=p=0", src],
+                       stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, universal_newlines=True)
+    nums = [int(x) for x in r.stdout.strip().split("\n")[0].split(",") if x.strip().isdigit()]
+    if len(nums) < 2:
+        raise RuntimeError("ukuran video tidak terbaca")
+    return nums[0], nums[1]
+
+
+# ---------- deteksi suara (berbasis energi) ----------
+def runs(flags):
+    out, i, n = [], 0, len(flags)
+    while i < n:
+        j = i
+        while j < n and flags[j] == flags[i]:
+            j += 1
+        out.append((i, j, bool(flags[i])))
+        i = j
+    return out
+
+
+def close_gaps(flags, k):
+    f = flags.copy()
+    for a, b, v in runs(flags):
+        if (not v) and (b - a) < k and a > 0 and b < len(f):
+            f[a:b] = True
+    return f
+
+
+def drop_short(flags, k):
+    f = flags.copy()
+    for a, b, v in runs(flags):
+        if v and (b - a) < k:
+            f[a:b] = False
+    return f
+
+
+def speech_track(src, start, dur, sens):
+    n = int(dur * FPS) + 2
+    p = subprocess.run(["ffmpeg", "-v", "error", "-ss", str(start), "-t", str(dur), "-i", src,
+                        "-vn", "-ac", "1", "-ar", "16000", "-f", "s16le", "-"],
+                       stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    a = np.frombuffer(p.stdout, dtype=np.int16).astype(np.float32) / 32768.0
+    hop = 320  # 20 ms
+    m = a.size // hop
+    if m < 5:
+        return np.zeros(n, bool)
+    fr = a[:m * hop].reshape(m, hop)
+    db = 20.0 * np.log10(np.sqrt((fr * fr).mean(axis=1)) + 1e-9)
+    lo, hi = np.percentile(db, 15), np.percentile(db, 95)
+    rng = hi - lo
+    if hi < -55:
+        flags = np.zeros(m, bool)
+    elif rng < 8:
+        flags = np.full(m, hi > -40)
+    else:
+        flags = db > lo + max(6.0, sens * rng)
+    flags = close_gaps(flags, 35)   # tutup jeda < 0,7 dtk
+    flags = drop_short(flags, 12)   # buang bunyi < 0,24 dtk
+    idx = np.minimum(((np.arange(n) + 0.5) / FPS / 0.02).astype(int), m - 1)
+    return flags[idx]
+
+
+# ---------- pelacak wajah ----------
+def find_cascade():
+    name = "haarcascade_frontalface_default.xml"
+    cands = []
+    try:
+        cands.append(cv2.data.haarcascades + name)
+    except Exception:
+        pass
+    cands += ["/usr/share/opencv4/haarcascades/" + name,
+              "/usr/share/opencv/haarcascades/" + name,
+              "/data/data/com.termux/files/usr/share/opencv4/haarcascades/" + name,
+              "/opt/homebrew/share/opencv4/haarcascades/" + name,
+              "/usr/local/share/opencv4/haarcascades/" + name]
+    for c in cands:
+        if os.path.isfile(c):
+            return c
+    return None
+
+
+class FaceTracker:
+    def __init__(self, W, H):
+        path = find_cascade()
+        if not path:
+            raise RuntimeError("berkas cascade wajah tidak ditemukan")
+        self.cas = cv2.CascadeClassifier(path)
+        if self.cas.empty():
+            raise RuntimeError("cascade wajah gagal dimuat")
+        self.dw = min(480, W)
+        self.sc = self.dw / float(W)
+        self.dh = max(2, int(round(H * self.sc)))
+        self.tracks = []
+        self.prev = None
+        self.sel = None
+        self.sel_t = 0.0
+        self.seen_t = -99.0
+
+    def update(self, frame, t):
+        g0 = cv2.cvtColor(cv2.resize(frame, (self.dw, self.dh), interpolation=cv2.INTER_AREA),
+                          cv2.COLOR_BGR2GRAY)
+        ms = max(24, int(self.dh * 0.07))
+        faces = self.cas.detectMultiScale(cv2.equalizeHist(g0), 1.1, 6, minSize=(ms, ms))
+        diff = cv2.absdiff(g0, self.prev) if self.prev is not None else None
+        self.prev = g0
+        used = set()
+        for (x, y, w, h) in faces:
+            cx, cy = (x + w / 2.0) / self.sc, (y + h / 2.0) / self.sc
+            fw, fh = w / self.sc, h / self.sc
+            motion = 0.0
+            if diff is not None:
+                my0, my1 = int(y + 0.62 * h), int(y + 0.95 * h)
+                mx0, mx1 = int(x + 0.2 * w), int(x + 0.8 * w)
+                roi = diff[my0:my1, mx0:mx1]
+                if roi.size:
+                    motion = float(roi.mean())
+            best, bd = None, 1e18
+            for tr in self.tracks:
+                if id(tr) in used:
+                    continue
+                d = ((tr["cx"] - cx) ** 2 + (tr["cy"] - cy) ** 2) ** 0.5
+                if d < 0.8 * max(fw, tr["w"]) and d < bd:
+                    best, bd = tr, d
+            if best is None:
+                best = {"cx": cx, "cy": cy, "w": fw, "h": fh, "score": motion, "seen": t}
+                self.tracks.append(best)
+            else:
+                best["cx"] += (cx - best["cx"]) * 0.5
+                best["cy"] += (cy - best["cy"]) * 0.5
+                best["w"] += (fw - best["w"]) * 0.5
+                best["h"] += (fh - best["h"]) * 0.5
+                best["score"] = 0.7 * best["score"] + 0.3 * motion
+                best["seen"] = t
+            used.add(id(best))
+        self.tracks = [tr for tr in self.tracks if t - tr["seen"] < 1.5]
+        live = [tr for tr in self.tracks if t - tr["seen"] < 1.0]
+        if live:
+            self.seen_t = t
+            if self.sel not in live:
+                self.sel = max(live, key=lambda r: r["w"] * r["h"])
+                self.sel_t = t
+            else:
+                top = max(live, key=lambda r: r["score"])
+                if top is not self.sel and t - self.sel_t > 1.2 and top["score"] > 1.4 * self.sel["score"] + 0.5:
+                    self.sel, self.sel_t = top, t
+        return (self.sel["cx"], self.sel["cy"], self.sel["w"], self.sel["h"]) if (live and self.sel) else None
+
+
+# ---------- kamera virtual ----------
+def lerp(a, b, z):
+    return a + (b - a) * z
+
+
+def clampf(v, a, b):
+    return max(a, min(b, v))
+
+
+def window(fmt, z, W, H, OW, OH, face, zoom):
+    if fmt == "blur":
+        dh0 = OW * H / float(W)
+        dh = lerp(dh0, OH, z)
+    else:
+        dh = float(OH)
+    asp = OW / dh
+    wh_zoom = H / zoom
+    if face:
+        fx, fy, fw, fh = face
+        wh_zoom = max(wh_zoom, fh * 2.4, fw * 1.6 / (OW / float(OH)))
+    wh_zoom = min(float(H), wh_zoom)
+    wh = lerp(float(H), wh_zoom, z)
+    ww = wh * asp
+    if ww > W:
+        ww = float(W)
+        wh = ww / asp
+    cxw = face[0] if (fmt == "crop" and face) else W / 2.0
+    cx = lerp(cxw, face[0] if face else cxw, z)
+    cy = lerp(H / 2.0, (face[1] + 0.10 * wh_zoom) if face else H / 2.0, z)
+    x0 = clampf(cx - ww / 2.0, 0, W - ww)
+    y0 = clampf(cy - wh / 2.0, 0, H - wh)
+    return x0, y0, ww, wh, dh
+
+
+def make_bg(frame, W, H, OW, OH):
+    cw = min(W, int(H * OW / float(OH)))
+    x0 = (W - cw) // 2
+    small = cv2.resize(frame[:, x0:x0 + cw], (max(16, OW // 12), max(16, OH // 12)), interpolation=cv2.INTER_AREA)
+    small = cv2.GaussianBlur(small, (0, 0), 1.5)
+    return cv2.convertScaleAbs(cv2.resize(small, (OW, OH), interpolation=cv2.INTER_CUBIC), alpha=0.55)
+
+
+def render(frame, bg, x0, y0, ww, wh, dh, OW, OH):
+    dhi = min(OH, max(2, int(round(dh))))
+    if dhi >= OH - 1:
+        dhi = OH
+    sx = OW / ww
+    if sx < 0.9:
+        xi, yi = int(round(x0)), int(round(y0))
+        wi, hi = max(2, int(round(ww))), max(2, int(round(wh)))
+        fg = cv2.resize(frame[yi:yi + hi, xi:xi + wi], (OW, dhi), interpolation=cv2.INTER_AREA)
+    else:
+        sy = dhi / wh
+        M = np.float32([[sx, 0, -x0 * sx], [0, sy, -y0 * sy]])
+        fg = cv2.warpAffine(frame, M, (OW, dhi), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+    if dhi == OH:
+        return fg
+    out = bg.copy()
+    y = (OH - dhi) // 2
+    out[y:y + dhi] = fg
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("src")
+    ap.add_argument("start", type=float)
+    ap.add_argument("dur", type=float)
+    ap.add_argument("out")
+    ap.add_argument("--fmt", default="blur", choices=["blur", "crop", "asli"])
+    ap.add_argument("--zoom", type=float, default=1.8)
+    ap.add_argument("--sens", type=float, default=0.35)
+    ap.add_argument("--crf", type=int, default=20)
+    ap.add_argument("--preset", default="veryfast")
+    ap.add_argument("--h", type=int, default=1080)
+    ap.add_argument("--fx", default="")
+    ap.add_argument("--logo", default="")
+    ap.add_argument("--lw", type=int, default=0)
+    ap.add_argument("--lx", default="")
+    ap.add_argument("--ly", default="")
+    ap.add_argument("--lop", default="1")
+    a = ap.parse_args()
+
+    try:
+        W, H = probe(a.src)
+        tracker = FaceTracker(W, H)
+    except Exception as e:
+        sys.stderr.write("[zoomwajah] %s - pakai potongan biasa.\n" % e)
+        sys.exit(2)
+
+    vertical = a.fmt in ("blur", "crop")
+    if vertical:
+        OW = 1080 if a.h >= 1080 else 720
+        OH = OW * 16 // 9
+    else:
+        OH = a.h
+        OW = int(round(OH * 16 / 9.0 / 2.0)) * 2
+    zoom = max(1.1, a.zoom)
+
+    speaking = speech_track(a.src, a.start, a.dur, a.sens)
+
+    dec = subprocess.Popen(["ffmpeg", "-v", "error", "-ss", str(a.start), "-t", str(a.dur), "-i", a.src,
+                            "-an", "-vf", "fps=%d" % FPS, "-f", "rawvideo", "-pix_fmt", "bgr24", "-"],
+                           stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    enc_cmd = ["ffmpeg", "-y", "-v", "error", "-f", "rawvideo", "-pix_fmt", "bgr24",
+               "-s", "%dx%d" % (OW, OH), "-r", str(FPS), "-i", "-",
+               "-ss", str(a.start), "-t", str(a.dur), "-i", a.src,
+               ]
+    use_logo = bool(a.logo) and os.path.isfile(a.logo) and a.lw > 0
+    if use_logo:
+        enc_cmd += ["-loop", "1", "-t", str(a.dur), "-i", a.logo]
+    if a.fx or use_logo:
+        g = "[0:v]%s" % (a.fx or "null")
+        if use_logo:
+            g += ("[v1];[2:v]format=rgba,scale=%d:-1,colorchannelmixer=aa=%s[lg];"
+                  "[v1][lg]overlay=x='%s':y='%s':shortest=1[vout]" % (a.lw, a.lop, a.lx, a.ly))
+        else:
+            g += "[vout]"
+        enc_cmd += ["-filter_complex", g, "-map", "[vout]", "-map", "1:a?", "-shortest"]
+    else:
+        enc_cmd += ["-map", "0:v", "-map", "1:a?", "-shortest"]
+    enc_cmd += ["-c:v", "libx264", "-preset", a.preset, "-crf", str(a.crf), "-pix_fmt", "yuv420p",
+                "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", a.out]
+    enc = subprocess.Popen(enc_cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
+
+    fsz = W * H * 3
+    total = max(1, int(a.dur * FPS))
+    z = 0.0
+    cam = None
+    bg = None
+    face = None
+    fi = 0
+    n_zoom = n_face = 0
+    name = os.path.basename(a.out)
+    try:
+        while True:
+            buf = dec.stdout.read(fsz)
+            if len(buf) < fsz:
+                break
+            frame = np.frombuffer(buf, np.uint8).reshape(H, W, 3)
+            t = fi / float(FPS)
+            if fi % 3 == 0:
+                face = tracker.update(frame, t)
+            if face is not None:
+                if cam is None:
+                    cam = list(face)
+                else:
+                    for k in range(4):
+                        cam[k] += (face[k] - cam[k]) * 0.15
+            ok = cam is not None and (t - tracker.seen_t) < 2.0
+            talk = bool(speaking[min(fi, len(speaking) - 1)])
+            target = 1.0 if (talk and ok) else 0.0
+            z += (target - z) * (0.35 if target > z else 0.07)
+            ze = z * z * (3.0 - 2.0 * z)
+            x0, y0, ww, wh, dh = window(a.fmt, ze, W, H, OW, OH, cam if ok else None, zoom)
+            if a.fmt == "blur" and dh < OH - 1 and (bg is None or fi % 3 == 0):
+                bg = make_bg(frame, W, H, OW, OH)
+            out = render(frame, bg, x0, y0, ww, wh, dh, OW, OH)
+            enc.stdin.write(out.tobytes())
+            if ok:
+                n_face += 1
+            if ze > 0.5:
+                n_zoom += 1
+            fi += 1
+            if fi % 60 == 0:
+                sys.stderr.write("\r[zoomwajah] %s  %d%%" % (name, min(99, fi * 100 // total)))
+        enc.stdin.close()
+    except (BrokenPipeError, OSError):
+        sys.stderr.write("\n[zoomwajah] encoder berhenti tak terduga.\n")
+        dec.kill()
+        enc.kill()
+        sys.exit(1)
+    dec.stdout.close()
+    dec.wait()
+    enc.wait()
+    if fi == 0 or enc.returncode != 0:
+        sys.stderr.write("\n[zoomwajah] gagal membuat %s\n" % name)
+        sys.exit(1)
+    sys.stderr.write("\r[zoomwajah] %s  100%%  wajah terdeteksi %d%% · zoom aktif %d%% durasi\n"
+                     % (name, n_face * 100 // fi, n_zoom * 100 // fi))
+
+
+if __name__ == "__main__":
+    main()
+</script>
+
+<script>
+/* ================================================================
+   POTONG/20 — logika aplikasi (vanilla JS, tanpa build step)
+================================================================ */
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const KEY='potong20.v1';
+
+const DEFAULT_PARAMS={count:20,durMin:30,durMax:45,skipStart:5,skipEnd:10,
+  mode:'merata',seed:1234,format:'blur',crf:20,brand:'',hashtags:'#fyp #viral #shorts',platform:'termux',
+  cam:true,zoom:1.8,sens:0.35,
+  font:'poppins',titleMode:'judul',titleSec:4,titleTxt:'',sub:true,subLang:'id',subStyle:'putih',subPos:'bawah',
+  logoMove:'float',logoSize:0.18,logoOp:0.9};
+const state={videoId:null,link:'',title:'',author:'',duration:0,metaDone:false,embedBlocked:false,
+  loop:true,previewIdx:-1,params:{...DEFAULT_PARAMS},clips:[],logo:''};
+
+let yt=null,ytReady=false,pendingLoad=null,pendingCue=null,watchIv=null,drag=null;
+
+/* ---------- util ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+function fmtTC(s){s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
+  return(h?h+':':'')+String(m).padStart(h?2:1,'0')+':'+String(x).padStart(2,'0');}
+function icons(){try{lucide.createIcons();}catch(e){}}
+let toastT;
+function toast(msg){$('#toast-msg').textContent=msg;const t=$('#toast');t.classList.add('on');icons();
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2400);}
+async function copyText(txt){try{await navigator.clipboard.writeText(txt);return true;}
+  catch(e){const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy');}catch(_){/*noop*/}ta.remove();return ok;}}
+function download(name,content){const b=new Blob([content],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
+const escAttr=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+function slug(s){return s.toLowerCase().replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'_').slice(0,24)||'klip';}
+function baseName(){return state.params.brand?slug(state.params.brand):'klip';}
+function fileName(i){return baseName()+'_'+String(i+1).padStart(2,'0');}
+function defaultCap(i){const t=state.title||'video ini';
+  return('Klip '+(i+1)+'/'+state.clips.length+' — '+t+' '+(state.params.hashtags||'')).trim();}
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};}
+
+/* ---------- link parsing ---------- */
+function parseYT(u){u=(u||'').trim();if(!u)return null;
+  const pats=[/youtu\.be\/([\w-]{11})/,/[?&]v=([\w-]{11})/,/\/shorts\/([\w-]{11})/,
+              /\/embed\/([\w-]{11})/,/\/live\/([\w-]{11})/];
+  for(const p of pats){const m=u.match(p);if(m)return m[1];}
+  if(/^[\w-]{11}$/.test(u))return u;return null;}
+
+/* ---------- pemutar YouTube ---------- */
+/* Error 153 = YouTube tidak menerima "asal" halaman (file:// atau referrer dihapus).
+   Pemutar hanya dibuat bila halaman dilayani lewat http(s); selain itu langsung pakai cadangan. */
+const ORIGIN_OK=/^https?:$/.test(location.protocol);
+window.onYouTubeIframeAPIReady=function(){ytReady=true;initPlayer();};
+function playerVars(){const v={playsinline:1,rel:0,modestbranding:1};
+  if(ORIGIN_OK){v.origin=location.origin;v.widget_referrer=location.href;}return v;}
+function initPlayer(){
+  if(!ORIGIN_OK||yt)return;
+  yt=new YT.Player('ytmount',{width:'100%',height:'100%',playerVars:playerVars(),
+    events:{
+      onReady:()=>{ if(pendingLoad){const id=pendingLoad;pendingLoad=null;startMetaPlayback(id);}
+                    else if(pendingCue){const id=pendingCue;pendingCue=null;try{yt.cueVideoById(id);}catch(e){}}
+                    if(!state.embedBlocked)$('#playermsg').style.display='none'; },
+      onStateChange:e=>{
+        if(e.data===YT.PlayerState.PLAYING){
+          if(!state.metaDone&&state.videoId)captureMeta();
+          startWatch();
+        }else if(e.data===YT.PlayerState.PAUSED||e.data===YT.PlayerState.ENDED){
+          stopWatch();setRec(false);
+        }},
+      onError:e=>blockPlayer(e&&e.data)
+    }});
+}
+function embedMsg(code){
+  if(!ORIGIN_OK)return['ERROR 153 · HALAMAN DIBUKA SEBAGAI BERKAS LOKAL',
+    'YouTube hanya memutar video di halaman yang beralamat http(s). Halaman ini dibuka langsung dari berkas (file://), jadi pemutar ditolak.\n\nPerbaikan: di folder berkas ini jalankan\n   python -m http.server 8080\nlalu buka http://localhost:8080 — atau unggah berkas ini ke Netlify Drop / GitHub Pages / Cloudflare Pages.\n\nTanpa pemutar pun, isi durasi di samping: timeline, rencana potong & script ekspor tetap berfungsi penuh.'];
+  if(code===153)return['ERROR 153 · REFERRER TIDAK TERKIRIM',
+    'YouTube tidak menerima alamat halaman ini. Penyebab umum: ekstensi privasi / pemblokir yang menghapus referrer, atau hosting yang mengirim Referrer-Policy: no-referrer.\n\nCoba: matikan ekstensi tersebut untuk halaman ini lalu muat ulang, atau buka lewat alamat https. Sementara itu isi durasi di samping — semua fitur lain tetap berfungsi.'];
+  if(code===101||code===150)return['DIBLOKIR OLEH PEMILIK VIDEO','Pemilik video melarang pemutaran di situs lain. Isi durasi manual di samping — rencana potong & script ekspor tetap berfungsi penuh.'];
+  return['PEMUTAR TIDAK BISA DIMUAT','Pemutar YouTube tidak termuat (jaringan diblokir atau video tidak tersedia).\nIsi durasi video secara manual di samping — rencana potong & script ekspor tetap berfungsi penuh.'];
+}
+function blockPlayer(code){state.embedBlocked=true;const m=embedMsg(code);showPlayerMsg(m[0],m[1]);}
+function showPlayerMsg(title,text){
+  $('#pm-title').textContent=title;$('#pm-text').textContent=text;
+  const id=state.videoId,yl=$('#pm-yt');
+  $('#pm-bg').style.backgroundImage=id?'url(https://i.ytimg.com/vi/'+id+'/hqdefault.jpg)':'none';
+  yl.style.display=id?'inline-flex':'none';if(id)yl.href='https://www.youtube.com/watch?v='+id;
+  $('#pm-retry').style.display=ORIGIN_OK?'inline-flex':'none';
+  $('#playermsg').style.display='block';icons();
+}
+function startMetaPlayback(id){
+  state.embedBlocked=false;state.metaDone=false;$('#playermsg').style.display='none';
+  try{yt.loadVideoById(id);yt.mute();yt.playVideo();}catch(e){}
+  setTimeout(()=>{if(!state.metaDone&&state.videoId===id)noembedFill(id);},6000);
+}
+function captureMeta(){
+  let tries=0;
+  const iv=setInterval(()=>{
+    tries++;let d=0,t='',a='';
+    try{d=yt.getDuration();const vd=yt.getVideoData();t=vd.title||'';a=vd.author||'';}catch(e){}
+    if(d>0){clearInterval(iv);state.metaDone=true;
+      state.duration=Math.round(d);if(t)state.title=t;if(a)state.author=a;
+      fillMetaUI();planClips();
+      setTimeout(()=>{try{yt.pauseVideo();yt.seekTo(0,true);yt.unMute();}catch(e){}},350);
+    }else if(tries>40){clearInterval(iv);
+      $('#in-duration').classList.add('need');
+      toast('Durasi tidak terbaca otomatis — isi manual di kolom Durasi video.');}
+  },250);
+}
+function isoDur(s){const m=/^P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(s||'');
+  return m?(+m[1]||0)*86400+(+m[2]||0)*3600+(+m[3]||0)*60+(+m[4]||0):0;}
+async function fetchDuration(id){
+  const tryFetch=async(url,pick)=>{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),6000);
+    try{const r=await fetch(url,{signal:ctl.signal});const v=pick(await r.json());if(v>0)return v;}
+    catch(e){}finally{clearTimeout(to);}
+    throw new Error('x');};
+  try{return await Promise.any([
+    tryFetch('https://pipedapi.kavin.rocks/streams/'+id,j=>Math.round(+j.duration)),
+    tryFetch('https://yt.lemnoslife.com/noKey/videos?part=contentDetails&id='+id,
+             j=>isoDur(j.items&&j.items[0]&&j.items[0].contentDetails&&j.items[0].contentDetails.duration))]);}
+  catch(e){return 0;}
+}
+async function noembedFill(id){
+  try{
+    const r=await fetch('https://noembed.com/embed?url=https://www.youtube.com/watch?v='+id);
+    const j=await r.json();
+    if(state.metaDone)return;
+    if(j.duration&&Number(j.duration)>0){state.duration=Math.round(Number(j.duration));state.metaDone=true;}
+    if(j.title&&!state.title)state.title=j.title;
+    if(j.author_name&&!state.author)state.author=j.author_name;
+    fillMetaUI();
+  }catch(e){/* offline — pengguna isi manual */}
+  if(!state.duration&&state.videoId===id){
+    const d=await fetchDuration(id);
+    if(d>0&&state.videoId===id&&!state.duration){state.duration=d;state.metaDone=true;}
+  }
+  if(state.videoId!==id)return;
+  fillMetaUI();planClips();
+  if(!state.duration){$('#in-duration').classList.add('need');
+    toast('Durasi belum terbaca — isi manual di kolom Durasi video.');}
+}
+function fillMetaUI(){
+  $('#v-title').textContent=state.title||'Video YouTube';
+  $('#v-author').textContent=(state.author?'oleh '+state.author+' · ':'')+'ID '+state.videoId;
+  $('#v-id').textContent=state.videoId;
+  if(state.duration){$('#in-duration').value=state.duration;$('#in-duration').classList.remove('need');}
+  const vo=$('#v-open');if(state.videoId){vo.href='https://www.youtube.com/watch?v='+state.videoId;vo.style.display='inline-block';}
+  fxRender();
+  document.title='POTONG/20 — '+(state.title||'klip');
+}
+
+/* ---------- alur muat video ---------- */
+function loadVideo(){
+  const id=parseYT($('#in-link').value);
+  if(!id){const e=$('#link-err');e.style.display='block';
+    e.textContent='Link tidak dikenali. Tempel tautan watch, youtu.be, shorts, atau live.';return;}
+  $('#link-err').style.display='none';
+  state.videoId=id;
+  state.link='https://www.youtube.com/watch?v='+id;
+  state.title='';state.author='';state.metaDone=false;
+  fillMetaUI();showMain();
+  if(!ORIGIN_OK){blockPlayer();noembedFill(id);}
+  else if(yt)startMetaPlayback(id);else pendingLoad=id;
+  save();
+}
+function showMain(){const m=$('#main');if(m.dataset.on)return;m.dataset.on='1';m.style.display='block';
+  $('#hero').classList.add('compact');
+  $$('#main .reveal').forEach((el,i)=>setTimeout(()=>el.classList.add('on'),80+i*80));}
+
+/* ---------- penyusunan rencana ---------- */
+function planClips(){
+  state.previewIdx=-1;setRec(false);
+  const p=state.params,D=state.duration|0;let warn='';
+  if(!D){state.clips=[];warn='Isi durasi video (detik) di bagian Sumber — lalu tekan tombol susun ulang.';}
+  else{
+    const n=clamp(p.count|0,5,60);
+    const m0=clamp(p.skipStart|0,0,Math.max(0,D-30));
+    const m1=clamp(p.skipEnd|0,0,Math.max(0,D-m0-30));
+    const avail=D-m0-m1;
+    const r=mulberry32(p.seed>>>0);
+    const dmin=clamp(p.durMin|0,5,600),dmax=clamp(p.durMax|0,dmin,1200);
+    let durs=[],tot=0;
+    for(let i=0;i<n;i++){const d=dmin+Math.round(r()*(dmax-dmin));durs.push(d);tot+=d;}
+    const capT=avail*0.85;
+    if(tot>capT){const k=capT/tot;durs=durs.map(d=>Math.max(4,Math.round(d*k)));
+      tot=durs.reduce((a,b)=>a+b,0);
+      warn='Rentang durasi otomatis dirapatkan (rata-rata ±'+Math.round(tot/n)+' dtk) agar '+n+' klip muat dalam '+fmtTC(avail)+' area berguna.';}
+    if(tot>avail){warn='Video terlalu pendek untuk jumlah klip ini — kurangi jumlah klip atau durasinya.';state.clips=[];}
+    else{
+      const out=[];
+      if(p.mode==='merata'){
+        const gap=(avail-tot)/Math.max(1,n-1);let t=m0;
+        for(let i=0;i<n;i++){out.push({start:Math.round(t),dur:durs[i]});t+=durs[i]+gap;}
+      }else if(p.mode==='awal'){
+        let prev=m0;
+        for(let i=0;i<n;i++){
+          const f=n>1?Math.pow(i/(n-1),1.45):0;
+          let s=(m0+avail*f)-durs[i]/2;
+          s=clamp(s,prev,m0+avail-durs[i]);prev=s+durs[i];
+          out.push({start:Math.round(s),dur:durs[i]});
+        }
+      }else{ /* acak berbasis sel — bebas tumpang tindih secara konstruksi */
+        const ws=[];let sw=0;
+        for(let i=0;i<n;i++){const w=0.2+r();ws.push(w);sw+=w;}
+        let t=m0;
+        for(let i=0;i<n;i++){const cellW=avail*ws[i]/sw;
+          const d=Math.min(durs[i],Math.max(4,Math.floor(cellW)));
+          const s=t+(cellW>d?r()*(cellW-d):0);
+          out.push({start:Math.round(s),dur:d});t+=cellW;}
+      }
+      out.sort((a,b)=>a.start-b.start);
+      state.clips=out.map(o=>({start:o.start,dur:o.dur,cap:null}));
+    }
+  }
+  const wEl=$('#plan-warn');wEl.textContent=warn;wEl.style.display=warn?'block':'none';
+  renderAll();
+}
+function constrainStart(i,s){
+  const cs=state.clips,D=state.duration,p=state.params;
+  const m0=clamp(p.skipStart|0,0,Math.max(0,D-30));
+  const m1=clamp(p.skipEnd|0,0,Math.max(0,D-m0-30));
+  const c=cs[i];let lo=m0,hi=D-m1-c.dur;
+  if(i>0)lo=Math.max(lo,cs[i-1].start+cs[i-1].dur);
+  if(i<cs.length-1)hi=Math.min(hi,cs[i+1].start-c.dur);
+  if(hi<lo)hi=lo;
+  return clamp(Math.round(s),lo,hi);
+}
+function nudge(i,d){
+  const c=state.clips[i];const ns=constrainStart(i,c.start+d);
+  if(ns===c.start){toast('Mentok — dibatasi klip lain atau batas video.');return;}
+  c.start=ns;refreshPos(i);save();
+  if(state.previewIdx===i&&yt){try{yt.seekTo(c.start,true);}catch(e){}}
+}
+
+/* ---------- render ---------- */
+function renderAll(){renderTimeline();renderList();renderExport();updateAgg();icons();save();}
+function makeRuler(D){
+  const steps=[1,2,5,10,15,30,60,120,300,600,900,1800,3600];
+  const step=steps.find(s=>D/s<=10)||3600;
+  let h='';
+  for(let t=0;t<=D;t+=step)h+='<span>'+fmtTC(t)+'</span>';
+  return h;
+}
+function renderTimeline(){
+  const D=state.duration||0,track=$('#track'),ruler=$('#ruler');
+  if(!state.clips.length||!D){
+    track.innerHTML='<div class="tl-empty">'+(D?'Belum ada rencana potong.':'Menunggu durasi video…')+'</div>';
+    ruler.innerHTML='';$('#tl-count').textContent='';return;}
+  ruler.innerHTML=makeRuler(D);
+  track.innerHTML=state.clips.map((c,i)=>
+    '<div class="clip-block'+(i===state.previewIdx?' active':'')+'" data-i="'+i+
+    '" style="left:'+(c.start/D*100).toFixed(3)+'%;width:'+(c.dur/D*100).toFixed(3)+'%" title="'+fmtTC(c.start)+' → '+fmtTC(c.start+c.dur)+'"><span>'+String(i+1).padStart(2,'0')+'</span></div>'
+  ).join('')+'<div id="playhead"></div>';
+  $('#tl-count').textContent=state.clips.length+' blok · '+fmtTC(D)+' total';
+}
+function renderList(){
+  const box=$('#cliplist');
+  if(!state.clips.length){box.innerHTML='<div class="empty">Belum ada potongan — muat link & durasi dulu di atas.</div>';return;}
+  box.innerHTML=state.clips.map((c,i)=>{
+    const cap=c.cap!==null&&c.cap!==undefined?c.cap:defaultCap(i);
+    return '<div class="clip-row'+(i===state.previewIdx?' active':'')+'" data-i="'+i+'">'+
+      '<div class="c-no">'+String(i+1).padStart(2,'0')+'</div>'+
+      '<div class="c-tc"><span id="tc-s-'+i+'">'+fmtTC(c.start)+'</span><span class="arr">→</span><span class="t-end" id="tc-e-'+i+'">'+fmtTC(c.start+c.dur)+'</span></div>'+
+      '<div class="c-dur">'+c.dur+' dtk</div>'+
+      '<div class="c-file"><span class="fname">'+fileName(i)+'.mp4</span>'+
+        '<input class="cap-input" data-i="'+i+'" value="'+escAttr(cap)+'" placeholder="tulis caption untuk diunggah…"/></div>'+
+      '<div class="c-act">'+
+        '<button class="icobtn txt" data-act="n" data-d="-5">−5</button>'+
+        '<button class="icobtn txt" data-act="n" data-d="-1">−1</button>'+
+        '<button class="icobtn txt" data-act="n" data-d="1">+1</button>'+
+        '<button class="icobtn txt" data-act="n" data-d="5">+5</button>'+
+        '<button class="icobtn" data-act="play" aria-label="Pratinjau klip '+(i+1)+'"><i data-lucide="play"></i></button>'+
+        '<button class="icobtn" data-act="copy" aria-label="Salin perintah klip '+(i+1)+'"><i data-lucide="copy"></i></button>'+
+      '</div>'+
+      '<i class="c-prog" id="prog-'+i+'"></i></div>';
+  }).join('');
+}
+function refreshPos(i){
+  const c=state.clips[i],D=state.duration;
+  const s=$('#tc-s-'+i),e=$('#tc-e-'+i),bl=$('#track .clip-block[data-i="'+i+'"]');
+  if(s)s.textContent=fmtTC(c.start);
+  if(e)e.textContent=fmtTC(c.start+c.dur);
+  if(bl){bl.style.left=(c.start/D*100).toFixed(3)+'%';bl.style.width=(c.dur/D*100).toFixed(3)+'%';
+    bl.title=fmtTC(c.start)+' → '+fmtTC(c.start+c.dur);}
+}
+function updateAgg(){
+  const cs=state.clips,D=state.duration||0;
+  const tot=cs.reduce((a,c)=>a+c.dur,0);
+  $('#ag-count').textContent=cs.length;
+  $('#ag-used').textContent=fmtTC(tot);
+  $('#ag-pct').textContent=D?Math.round(tot/D*100)+'%':'—';
+  $('#ag-avg').textContent=cs.length?Math.round(tot/cs.length)+' dtk':'—';
+}
+
+/* ---------- pratinjau & watch loop ---------- */
+function setRec(on){
+  const b=$('#recbadge');
+  if(on){$('#rec-txt').textContent='PRATINJAU · KLIP '+String(state.previewIdx+1).padStart(2,'0');b.style.display='flex';}
+  else b.style.display='none';
+}
+function renderActiveMarks(){
+  $$('#track .clip-block').forEach(b=>b.classList.toggle('active',+b.dataset.i===state.previewIdx));
+  $$('#cliplist .clip-row').forEach(r=>r.classList.toggle('active',+r.dataset.i===state.previewIdx));
+}
+function previewClip(i,scroll){
+  if(state.embedBlocked||!yt||!state.videoId){
+    if(state.videoId&&state.clips[i]){const c0=state.clips[i];
+      window.open('https://www.youtube.com/watch?v='+state.videoId+'&t='+Math.floor(c0.start)+'s','_blank','noopener');
+      toast('Pemutar tertanam tidak tersedia — klip '+(i+1)+' dibuka di YouTube mulai '+fmtTC(c0.start)+'.');}
+    return;}
+  state.previewIdx=i;renderActiveMarks();setRec(true);
+  const c=state.clips[i];
+  try{yt.unMute();yt.seekTo(c.start,true);yt.playVideo();}catch(e){}
+  if(scroll)$('#playerbox').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function setRowProgress(i,f){const p=$('#prog-'+i);if(p)p.style.width=(clamp(f,0,1)*100).toFixed(1)+'%';}
+function updatePlayhead(t){
+  const ph=$('#playhead');if(!ph||!state.duration)return;
+  ph.style.display='block';ph.style.left=clamp(t/state.duration*100,0,100).toFixed(2)+'%';
+}
+function startWatch(){stopWatch();
+  watchIv=setInterval(()=>{
+    if(!yt)return;let t=0;try{t=yt.getCurrentTime();}catch(e){}
+    updatePlayhead(t);
+    const i=state.previewIdx;
+    if(i>=0&&state.clips[i]){const c=state.clips[i];
+      setRowProgress(i,(t-c.start)/c.dur);
+      if(t>=c.start+c.dur-0.08){
+        if(state.loop){try{yt.seekTo(c.start,true);}catch(e){}}
+        else{try{yt.pauseVideo();}catch(e){}state.previewIdx=-1;setRec(false);renderActiveMarks();}
+      }}
+  },110);}
+function stopWatch(){clearInterval(watchIv);watchIv=null;}
+
+/* timeline: seret & ketuk */
+const track=$('#track');
+track.addEventListener('pointerdown',e=>{
+  const bl=e.target.closest('.clip-block');
+  if(!bl){ /* area kosong: lompat ke posisi */
+    if(yt&&state.duration){const r=track.getBoundingClientRect();
+      try{yt.seekTo((e.clientX-r.left)/r.width*state.duration,true);}catch(err){}}
+    return;}
+  const r=track.getBoundingClientRect(),br=bl.getBoundingClientRect();
+  drag={i:+bl.dataset.i,off:(e.clientX-br.left)/br.width*state.clips[+bl.dataset.i].dur,
+        rect:r,moved:0,x0:e.clientX,t0:Date.now(),el:bl};
+  bl.classList.add('drag');bl.setPointerCapture(e.pointerId);e.preventDefault();
+});
+track.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  drag.moved=Math.max(drag.moved,Math.abs(e.clientX-drag.x0));
+  if(drag.moved>4){
+    const s=(e.clientX-drag.rect.left)/drag.rect.width*state.duration-drag.off;
+    state.clips[drag.i].start=constrainStart(drag.i,s);
+    refreshPos(drag.i);
+  }
+});
+track.addEventListener('pointerup',e=>{
+  if(!drag)return;
+  const wasTap=drag.moved<6&&Date.now()-drag.t0<500,i=drag.i;
+  drag.el.classList.remove('drag');drag=null;
+  if(wasTap)previewClip(i,false);
+  else save();
+});
+track.addEventListener('pointercancel',()=>{if(drag){drag.el.classList.remove('drag');drag=null;}});
+
+/* ---------- perintah & script ekspor ---------- */
+function outDims(){
+  const H=state.params.platform==='ish'?720:1080;
+  if(state.params.format==='asli')return{H,vert:false,ow:Math.round(H*16/9/2)*2,oh:H};
+  const ow=H>=1080?1080:720;
+  return{H,vert:true,ow,oh:Math.round(ow*16/9)};
+}
+function cleanBrand(){return(state.params.brand||'').replace(/[\\'":%$`]/g,' ').replace(/\s+/g,' ').trim();}
+function shq(s){return"'"+s+"'";}
+function buildVF(){
+  const p=state.params,d=outDims();
+  if(p.format==='blur')
+    return'split[a][b];[a]scale='+d.ow+':'+d.oh+':force_original_aspect_ratio=increase,crop='+d.ow+':'+d.oh+',boxblur=20:4[bg];'+
+          '[b]scale='+d.ow+':-2[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2';
+  if(p.format==='crop')
+    return'crop=ih*9/16:ih,scale='+d.ow+':'+d.oh;
+  return'';
+}
+/* ---------- font · judul · subtitle · logo ---------- */
+const FONTS=[
+ {id:'poppins',label:'Poppins ExtraBold — modern & tegas',file:'Poppins-ExtraBold.ttf',path:'ofl/poppins/Poppins-ExtraBold.ttf',css:'Poppins:wght@800',fam:"'Poppins'",w:800},
+ {id:'anton',label:'Anton — tebal ramping (gaya berita/shorts)',file:'Anton-Regular.ttf',path:'ofl/anton/Anton-Regular.ttf',css:'Anton',fam:"'Anton'",w:400},
+ {id:'bebas',label:'Bebas Neue — kapital ramping',file:'BebasNeue-Regular.ttf',path:'ofl/bebasneue/BebasNeue-Regular.ttf',css:'Bebas+Neue',fam:"'Bebas Neue'",w:400},
+ {id:'archivo',label:'Archivo Black — kokoh',file:'ArchivoBlack-Regular.ttf',path:'ofl/archivoblack/ArchivoBlack-Regular.ttf',css:'Archivo+Black',fam:"'Archivo Black'",w:400},
+ {id:'bangers',label:'Bangers — komik seru',file:'Bangers-Regular.ttf',path:'ofl/bangers/Bangers-Regular.ttf',css:'Bangers',fam:"'Bangers'",w:400},
+ {id:'luckiest',label:'Luckiest Guy — ceria & besar',file:'LuckiestGuy-Regular.ttf',path:'apache/luckiestguy/LuckiestGuy-Regular.ttf',css:'Luckiest+Guy',fam:"'Luckiest Guy'",w:400},
+ {id:'lilita',label:'Lilita One — bulat & ramah',file:'LilitaOne-Regular.ttf',path:'ofl/lilitaone/LilitaOne-Regular.ttf',css:'Lilita+One',fam:"'Lilita One'",w:400},
+ {id:'marker',label:'Permanent Marker — tulisan tangan',file:'PermanentMarker-Regular.ttf',path:'apache/permanentmarker/PermanentMarker-Regular.ttf',css:'Permanent+Marker',fam:"'Permanent Marker'",w:400},
+ {id:'pacifico',label:'Pacifico — kursif santai',file:'Pacifico-Regular.ttf',path:'ofl/pacifico/Pacifico-Regular.ttf',css:'Pacifico',fam:"'Pacifico'",w:400},
+ {id:'pixel',label:'Press Start 2P — retro game',file:'PressStart2P-Regular.ttf',path:'ofl/pressstart2p/PressStart2P-Regular.ttf',css:'Press+Start+2P',fam:"'Press Start 2P'",w:400},
+ {id:'sistem',label:'Font sistem perangkat (tanpa unduh)',file:'',path:'',css:'',fam:'sans-serif',w:700}
+];
+const LOGO_KEY='potong20.logo';
+function fontDef(){return FONTS.find(f=>f.id===state.params.font)||FONTS[0];}
+function shs(s){return"'"+String(s).replace(/\s+/g,' ').replace(/'/g,"'\\''")+"'";}
+function pad2(n){return String(n).padStart(2,'0');}
+function titleFor(i){const p=state.params;
+  if(p.titleMode==='judul')return(state.title||'').trim();
+  if(p.titleMode==='caption'){const c=state.clips[i];if(!c)return'';
+    const t=(c.cap!==null&&c.cap!==undefined)?c.cap:defaultCap(i);return t.replace(/#\S+/g,'').replace(/\s+/g,' ').trim();}
+  if(p.titleMode==='custom')return(p.titleTxt||'').trim();
+  return'';}
+function fxOn(){const p=state.params;return p.titleMode!=='off'||!!p.sub||!!cleanBrand();}
+function logoGeom(d){const ref=d.vert?d.ow:d.oh;
+  return{lw:Math.max(16,Math.round(ref*state.params.logoSize/2)*2),M:Math.round(ref*0.04),bf:d.vert?0.62:0.70};}
+/* gerak logo — rumus yang sama dipakai ffmpeg (overlay) dan pratinjau di halaman ini */
+function logoExpr(mode,d){
+  const g=logoGeom(d),M=g.M,bf=g.bf;
+  const RX='(W-w-2*'+M+')',RY='('+bf+'*H-h-2*'+M+')';
+  if(mode==='float')return{
+    x:M+'+'+RX+'*(0.5+0.5*sin(0.7*t))',
+    y:M+'+'+RY+'*(0.5+0.5*sin(0.45*t+1))'};
+  if(mode==='bounce')return{
+    x:M+'+abs(mod(t*0.14*W,2*'+RX+')-'+RX+')',
+    y:M+'+abs(mod(t*0.10*H,2*'+RY+')-'+RY+')'};
+  if(mode==='corner'){
+    const S='st(0,clip((mod(t,5)-4.2)/0.8,0,1));st(0,ld(0)*ld(0)*(3-2*ld(0)))';
+    const cx='between(mod(floor(t/5),4),1,2)',nx='between(mod(floor(t/5)+1,4),1,2)';
+    const cy='gte(mod(floor(t/5),4),2)',ny='gte(mod(floor(t/5)+1,4),2)';
+    return{x:S+';'+M+'+'+RX+'*('+cx+'+('+nx+'-'+cx+')*ld(0))',
+           y:S+';'+M+'+'+RY+'*('+cy+'+('+ny+'-'+cy+')*ld(0))'};}
+  return{x:'W-w-'+M,y:String(M)};
+}
+function logoPos(mode,t,W,H,w,h,M,bf){
+  const rx=W-w-2*M,ry=bf*H-h-2*M;
+  if(mode==='float')return{x:M+rx*(.5+.5*Math.sin(.7*t)),y:M+ry*(.5+.5*Math.sin(.45*t+1))};
+  if(mode==='bounce'){const tri=(v,R)=>Math.abs(v%(2*R)-R);return{x:M+tri(t*.14*W,rx),y:M+tri(t*.10*H,ry)};}
+  if(mode==='corner'){const n=Math.floor(t/5),m4=k=>((k%4)+4)%4,
+      cx=k=>(m4(k)>=1&&m4(k)<=2)?1:0,cy=k=>m4(k)>=2?1:0;
+    let s=Math.min(1,Math.max(0,((t%5)-4.2)/.8));s=s*s*(3-2*s);
+    return{x:M+rx*(cx(n)+(cx(n+1)-cx(n))*s),y:M+ry*(cy(n)+(cy(n+1)-cy(n))*s)};}
+  return{x:W-w-M,y:M};
+}
+function fontLines(){
+  const f=fontDef(),L=['# Font teks (judul, subtitle, nama akun) — diunduh sekali ke folder fonts/:','mkdir -p fonts','FONT=""'];
+  if(f.file){
+    L.push('getfont(){ [ -s "fonts/$1" ] || { curl -fsSL -o "fonts/$1" "$2" 2>/dev/null || wget -q -O "fonts/$1" "$2" 2>/dev/null; }; if [ -s "fonts/$1" ]; then FONT="$PWD/fonts/$1"; else rm -f "fonts/$1"; fi; }',
+      'getfont "'+f.file+'" "https://github.com/google/fonts/raw/main/'+f.path+'"');}
+  L.push('if [ -z "$FONT" ]; then',
+    '  for f in /system/fonts/Roboto-Bold.ttf /system/fonts/Roboto-Regular.ttf /system/fonts/NotoSans-Bold.ttf /system/fonts/NotoSans-Regular.ttf /system/fonts/DroidSans-Bold.ttf /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf /usr/share/fonts/dejavu/DejaVuSans-Bold.ttf /usr/share/fonts/TTF/DejaVuSans-Bold.ttf /usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf /System/Library/Fonts/Helvetica.ttc /Library/Fonts/Arial.ttf; do',
+    '    if [ -f "$f" ]; then FONT="$f"; break; fi',
+    '  done','fi',
+    'if [ -z "$FONT" ]; then echo "! font tidak ditemukan — judul/subtitle/nama akun dilewati"; fi');
+  return L;
+}
+function logoLines(){
+  const b=(state.logo||'').split(',')[1]||'';
+  return['','# Logo (tersemat dari halaman) — bergerak otomatis di tiap klip:',"cat > logo.b64 <<'LOGOEOF'",
+    ...(b.match(/.{1,76}/g)||[]),'LOGOEOF',
+    'base64 -d logo.b64 > logo.png 2>/dev/null || base64 -D -i logo.b64 -o logo.png','rm -f logo.b64'];
+}
+function plainCmd(i){
+  const c=state.clips[i],p=state.params,preset=p.platform==='ish'?'ultrafast':'veryfast',vf=buildVF();
+  let ff='ffmpeg -y -ss '+c.start+' -t '+c.dur+' -i sumber.mp4';
+  if(vf)ff+=' -vf "'+vf+'"';
+  return ff+' -c:v libx264 -preset '+preset+' -crf '+p.crf+
+      ' -pix_fmt yuv420p -c:a aac -b:a 160k -movflags +faststart "'+fileName(i)+'.mp4"';
+}
+function clipCmd(i,single){
+  const c=state.clips[i],p=state.params,d=outDims();
+  const logo=!!state.logo,rich=!single&&(fxOn()||logo);
+  if(!rich){
+    const ff=plainCmd(i);
+    if(!p.cam)return ff;
+    return'python3 zoomwajah.py sumber.mp4 '+c.start+' '+c.dur+' "'+fileName(i)+'.mp4" --fmt '+p.format+
+      ' --zoom '+p.zoom+' --sens '+p.sens+' --crf '+p.crf+' --preset '+(p.platform==='ish'?'ultrafast':'veryfast')+' --h '+d.H+' || '+ff;
+  }
+  const preset=p.platform==='ish'?'ultrafast':'veryfast',tag=pad2(i+1),title=titleFor(i),brand=cleanBrand();
+  let fxl='FX=$(python3 efek.py clip --tag '+tag+' --start '+c.start+' --dur '+c.dur+' --font "$FONT" --ow '+(d.vert?d.ow:'"${SW:-'+d.ow+'}"')+' --oh '+(d.vert?d.oh:'"${SH:-'+d.oh+'}"')+' --vert '+(d.vert?1:0);
+  if(title)fxl+=' '+shs('--title='+title)+' --titlesec '+p.titleSec;
+  if(brand)fxl+=' '+shs('--brand='+brand);
+  if(p.sub)fxl+=' --sub 1 --substyle '+p.subStyle+' --subpos '+p.subPos;
+  fxl+=' 2>/dev/null || true)';
+  const g=logoGeom(d),ex=logoExpr(p.logoMove,d);
+  const lg=function(idx){return'['+idx+':v]format=rgba,scale='+g.lw+':-1,colorchannelmixer=aa='+p.logoOp+'[lg];[v1][lg]overlay=x=\''+ex.x+'\':y=\''+ex.y+'\':shortest=1[vout]';};
+  /* jalur biasa: potong + format + efek + logo dalam satu filter_complex */
+  const vf=buildVF();
+  let G='[0:v]'+(vf||'null')+'[v0];[v0]${FX:-null}'+(logo?'[v1];'+lg(1):'[vout]');
+  let ff='ffmpeg -y -ss '+c.start+' -t '+c.dur+' -i sumber.mp4'+(logo?' -loop 1 -t '+c.dur+' -i logo.png':'')+
+    ' -filter_complex "'+G+'" -map "[vout]" -map 0:a? -t '+c.dur+
+    ' -c:v libx264 -preset '+preset+' -crf '+p.crf+' -pix_fmt yuv420p -c:a aac -b:a 160k -movflags +faststart "'+fileName(i)+'.mp4"';
+  if(!p.cam)return fxl+'\n'+ff;
+  let py='python3 zoomwajah.py sumber.mp4 '+c.start+' '+c.dur+' "'+fileName(i)+'.mp4" --fmt '+p.format+
+    ' --zoom '+p.zoom+' --sens '+p.sens+' --crf '+p.crf+' --preset '+preset+' --h '+d.H+' --fx "$FX"';
+  if(logo)py+=' --logo logo.png --lw '+g.lw+' --lx '+shs(ex.x)+' --ly '+shs(ex.y)+' --lop '+p.logoOp;
+  return fxl+'\n'+py+' || '+ff;   /* bila modul zoom gagal/tidak ada → potongan biasa */
+}
+function fmtLabel(){
+  return{blur:'9:16 latar blur',crop:'9:16 potong tengah',asli:'16:9 asli'}[state.params.format]+
+    (state.params.cam?' + zoom wajah saat bicara':'')+(state.params.sub?' + subtitle otomatis':'')+(state.logo?' + logo bergerak':'');
+}
+function fxSrc(){const el=document.getElementById('fx-src');return el?el.textContent.replace(/^\s*\n/,'').replace(/\s+$/,'')+'\n':'';}
+function pySrc(){const el=document.getElementById('py-src');return el?el.textContent.replace(/^\s*\n/,'').replace(/\s+$/,'')+'\n':'';}
+function buildScript(){
+  const p=state.params,n=state.clips.length,base=baseName(),cam=!!p.cam;
+  const H=outDims().H;
+  const link=state.link||('https://youtu.be/'+(state.videoId||'VIDEO_ID'));
+  const dl='yt-dlp -f "bv*[height<='+H+']+ba/b[height<='+H+']" --merge-output-format mp4 -o sumber.mp4 "'+link+'"';
+  const L=[];
+  if(p.platform==='termux'){
+    L.push('# ── POTONG/20 · Android (Termux) ──────────────────────────────',
+      '# Simpan sebagai potong20.sh lalu jalankan:  bash potong20.sh','',
+      '# 1) Pasang alat (sekali saja):',
+      'pkg update -y && pkg install -y python ffmpeg curl && pip install -U yt-dlp');
+    if(cam)L.push('pkg install -y python-numpy opencv-python || { pkg install -y x11-repo && pkg install -y opencv python-numpy; }');
+    L.push('','# 2) Unduh video sumber sekali:',dl);
+  }else if(p.platform==='ish'){
+    L.push('# ── POTONG/20 · iPhone / iPad (iSH) ──────────────────────────',
+      '# Simpan sebagai potong20.sh lalu jalankan:  sh potong20.sh',
+      '# Catatan: iSH mengemulasi x86 — untuk video panjang, sambungkan daya.','',
+      '# 1) Pasang alat (sekali saja):',
+      'apk add ffmpeg python3 py3-pip curl ttf-dejavu',
+      'pip3 install -U yt-dlp');
+    if(cam)L.push('apk add py3-numpy py3-opencv   # zoom wajah di iSH bergantung ketersediaan paket; jika gagal, klip dipotong biasa');
+    L.push('','# 2) Unduh video sumber sekali (720p agar lebih ringan):',dl);
+  }else{
+    L.push('# ── POTONG/20 · PC / Mac / Linux ─────────────────────────────',
+      '# Butuh yt-dlp & ffmpeg.',
+      '#   Mac:     brew install yt-dlp ffmpeg',
+      '#   Windows: winget install yt-dlp.yt-dlp Gyan.FFmpeg   (jalankan di Git Bash / WSL)',
+      '#   Linux:   sudo apt install ffmpeg curl && pip install -U yt-dlp');
+    if(cam)L.push('# Zoom wajah saat bicara butuh:  pip install numpy opencv-python-headless');
+    L.push('','# Unduh sumber sekali:',dl);
+  }
+  if(cam){
+    L.push('','# Modul kamera otomatis — zoom ke wajah saat subjek berbicara:',
+      "cat > zoomwajah.py <<'PYEOF'",pySrc().replace(/\n$/,''),'PYEOF',
+      'python3 -c "import cv2, numpy" 2>/dev/null || echo "! OpenCV/numpy belum terpasang — klip dipotong biasa (tanpa zoom wajah)."');
+  }
+  if(fxOn()||state.logo){
+    L.push('');
+    L.push(...fontLines());
+    if(state.logo)L.push(...logoLines());
+    L.push('','# Modul efek teks — judul, subtitle otomatis, nama akun:',
+      "cat > efek.py <<'PYEOF2'",fxSrc().replace(/\n$/,''),'PYEOF2','rm -rf .fx; mkdir -p .fx');
+    if(!outDims().vert)L.push('SW=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 sumber.mp4 2>/dev/null | head -n1)',
+      'SH=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 sumber.mp4 2>/dev/null | head -n1)');
+    if(p.sub){
+      const sl={id:'id,id-orig',en:'en,en-orig',auto:'id,id-orig,en,en-orig'}[p.subLang]||'id,id-orig';
+      L.push('','# Subtitle otomatis: ambil caption YouTube (ringan, tanpa AI) lalu cocokkan ke tiap klip.',
+        '# Bila video tanpa caption dan faster-whisper terpasang (pip install faster-whisper), Whisper dipakai sebagai cadangan.',
+        'rm -f sumber.*.vtt transkrip.json',
+        'yt-dlp --skip-download --write-subs --write-auto-subs --sub-langs "'+sl+'" --sub-format vtt -o "sumber.%(ext)s" "'+link+'" >/dev/null 2>&1 || echo "! caption YouTube tidak tersedia"',
+        'python3 efek.py prep --lang '+p.subLang+' --windows "'+state.clips.map(c=>c.start+':'+c.dur).join(',')+'" --src sumber.mp4');}
+  }
+  L.push('','# Potong '+n+' klip ('+fmtLabel()+'):','');
+  L.push(...state.clips.map((c,i)=>clipCmd(i)));
+  if(p.platform==='termux'){
+    L.push('',
+      '# (opsional) Salin hasil ke galeri:',
+      'termux-setup-storage',
+      'mkdir -p /sdcard/Movies/POTONG20 && cp ./'+base+'_*.mp4 /sdcard/Movies/POTONG20/');}
+  if(p.platform==='ish'){
+    L.push('','# Hasil ada di root iSH — buka lewat aplikasi Files.');}
+  L.push('','echo "✓ Selesai — '+n+' klip siap diunggah."');
+  return L.join('\n');
+}
+function setCamUI(){
+  const on=!!state.params.cam;
+  $('#row-zoom').classList.toggle('off',!on);
+  $('#cam-note').textContent=on
+    ?'Saat ada suara bicara, kamera langsung zoom ke wajah; saat jeda kembali lebar. Diterapkan di tahap ekspor (pratinjau YouTube tidak berubah). Butuh Python + OpenCV — bila tidak ada, klip dipotong biasa.'
+    :'Mati — klip dipotong lurus sesuai format keluaran.';
+}
+function buildCaptions(){
+  return state.clips.map((c,i)=>fileName(i)+'.mp4\n'+(c.cap!==null&&c.cap!==undefined?c.cap:defaultCap(i))+'\n').join('\n');
+}
+function buildJSON(){
+  return JSON.stringify({
+    app:'POTONG/20',video:{id:state.videoId,link:state.link,title:state.title,author:state.author,duration:state.duration},
+    params:state.params,
+    clips:state.clips.map((c,i)=>({no:i+1,start:c.start,end:c.start+c.dur,dur:c.dur,
+      tc:fmtTC(c.start)+' → '+fmtTC(c.start+c.dur),file:fileName(i)+'.mp4',
+      caption:c.cap!==null&&c.cap!==undefined?c.cap:defaultCap(i)}))
+  },null,2);
+}
+const EXP_STEPS={
+  termux:[
+    'Pasang <b>Termux</b> — paling mulus lewat <b>F-Droid</b> (versi Play Store sering usang).',
+    'Salin seluruh script di samping, lalu di Termux: <code>nano potong20.sh</code> → tempel → <code>Ctrl+O · Enter · Ctrl+X</code>.',
+    'Jalankan <code>bash potong20.sh</code>. Pengunduhan pertama memakan waktu sesuai panjang video.',
+    'Hasil: <b>20 file MP4</b> di folder aktif — perintah salin ke galeri sudah tersedia di akhir script.'],
+  ish:[
+    'Pasang <b>iSH</b> (gratis, official) dari <b>App Store</b>.',
+    'Buat berkas: <code>cat &gt; potong20.sh</code> → tempel script → tekan <code>Ctrl-D</code>.',
+    'Jalankan <code>sh potong20.sh</code>. iSH mengemulasi x86 — biarkan iPhone tercolok daya untuk video panjang.',
+    'Ambil hasil lewat aplikasi <b>Files → iSH → root</b>. Resolusi otomatis 720p agar tetap ringan.'],
+  pc:[
+    'Pastikan <b>yt-dlp</b> & <b>ffmpeg</b> terpasang (perintahnya ada di kepala script).',
+    'Simpan script sebagai <code>potong20.sh</code> dan jalankan <code>bash potong20.sh</code>.',
+    'Semua klip muncul di folder yang sama, siap diunggah.']
+};
+function renderExport(){
+  const plat=state.params.platform;
+  $('#exp-steps').innerHTML=EXP_STEPS[plat].map(s=>'<li>'+s+'</li>').join('');
+  $('#scriptbox').textContent=buildScript();
+  fxRender();
+}
+
+/* ---------- pratinjau tampilan & logo ---------- */
+const loadedFonts={};
+function ensureWebFont(f){if(!f.css||loadedFonts[f.id])return;loadedFonts[f.id]=1;
+  const l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family='+f.css+'&display=swap';document.head.appendChild(l);}
+const LOGO_PH="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='96'%3E%3Crect width='160' height='96' rx='12' fill='%23ffd400'/%3E%3Ctext x='80' y='62' font-family='monospace' font-weight='bold' font-size='34' text-anchor='middle' fill='%23141204'%3ELOGO%3C/text%3E%3C/svg%3E";
+const FX_SAMPLES=['Halo semuanya, selamat datang','di podcast kita hari ini','kita bahas sesuatu yang seru'];
+let fxS=null,fxSubIdx=-1;
+function fxRender(){
+  const box=$('#fxprev');if(!box)return;
+  const p=state.params,d=outDims(),f=fontDef();ensureWebFont(f);
+  const W=d.vert?190:320,H=d.vert?338:180,ref=d.vert?W:H,fam=f.fam+',sans-serif';
+  box.style.width=W+'px';box.style.height=H+'px';
+  $('#fxbg').style.backgroundImage=state.videoId?'url(https://i.ytimg.com/vi/'+state.videoId+'/hqdefault.jpg)':'none';
+  const stroke=(el,fs)=>{el.style.webkitTextStroke=(fs*0.09*2).toFixed(1)+'px #000';};
+  const br=$('#fx-brand'),bt=cleanBrand(),bfs=ref*0.04;
+  br.textContent=bt;br.style.display=bt?'block':'none';br.style.fontFamily=fam;br.style.fontWeight=f.w;br.style.fontSize=bfs+'px';br.style.top=(H*0.05)+'px';stroke(br,bfs*0.7);
+  const ti=$('#fx-title'),tt=titleFor(0)||(p.titleMode==='caption'?'Caption klip tampil di sini':state.title||'Judul klip tampil di sini'),tfs=ref*0.064;
+  ti.textContent=p.titleMode==='off'?'':tt;ti.style.display=p.titleMode==='off'?'none':'-webkit-box';
+  ti.style.fontFamily=fam;ti.style.fontWeight=f.w;ti.style.fontSize=tfs+'px';ti.style.top=(H*(d.vert?0.115:0.14))+'px';stroke(ti,tfs*0.7);
+  const sb=$('#fx-sub'),sp=sb.firstElementChild,sfs=ref*(d.vert?0.056:0.052);
+  sb.style.display=p.sub?'block':'none';sb.style.fontFamily=fam;sb.style.fontWeight=f.w;sb.style.fontSize=sfs+'px';
+  sb.style.top=(H*(p.subPos==='tengah'?0.5:(d.vert?0.70:0.82)))+'px';
+  sp.style.color=p.subStyle==='kuning'?'#ffd400':'#fff';
+  if(p.subStyle==='kotak'){sp.style.background='rgba(0,0,0,.6)';sp.style.padding=(sfs*0.3)+'px';sp.style.webkitTextStroke='0';}
+  else{sp.style.background='none';sp.style.padding='0';sp.style.webkitTextStroke=(sfs*0.09*2).toFixed(1)+'px #000';}
+  const lg=$('#fx-logo'),g=logoGeom(d),lw=Math.round(ref*state.params.logoSize);
+  lg.src=state.logo||LOGO_PH;lg.style.width=lw+'px';
+  fxS={W,H,vert:d.vert,lw,M:Math.round(ref*0.04),bf:g.bf,mode:p.logoMove,op:p.logoOp,tsec:p.titleSec,sub:p.sub,titleOn:p.titleMode!=='off'};
+  lg.style.opacity=p.logoOp;
+  logoUI();
+}
+function fxTick(ts){
+  requestAnimationFrame(fxTick);
+  if(!fxS||document.hidden||!document.getElementById('main').dataset.on)return;
+  const t=ts/1000,S=fxS,lg=$('#fx-logo'),h=lg.offsetHeight||S.lw*0.6;
+  const q=logoPos(S.mode,t,S.W,S.H,S.lw,h,S.M,S.bf);
+  lg.style.transform='translate('+q.x.toFixed(1)+'px,'+q.y.toFixed(1)+'px)';
+  if(S.titleOn){const ti=$('#fx-title');
+    if(S.tsec>0){const tt=t%9;ti.style.opacity=tt<S.tsec?Math.max(0,Math.min(1,tt/.4,(S.tsec-tt)/.4)):0;}else ti.style.opacity=1;}
+  if(S.sub){const i=Math.floor(t/2.2)%FX_SAMPLES.length;
+    if(i!==fxSubIdx){fxSubIdx=i;$('#fx-sub').firstElementChild.textContent=FX_SAMPLES[i];}}
+}
+function logoUI(){
+  const on=!!state.logo,th=$('#logo-thumb');
+  th.style.display=on?'block':'none';if(on&&th.src!==state.logo)th.src=state.logo;
+  $('#btn-logo-del').style.display=on?'inline-flex':'none';
+  $('#logo-note').textContent=on
+    ?'Logo tersemat di script & bergerak otomatis di setiap klip (PNG transparan paling rapi).'
+    :'Belum ada logo — pilih gambar (PNG transparan disarankan). Pratinjau memakai logo contoh.';
+}
+function loadLogo(file){
+  if(!file)return;
+  const url=URL.createObjectURL(file),img=new Image();
+  img.onload=()=>{
+    const nw=img.naturalWidth||256,nh=img.naturalHeight||256;let max=256,data='';
+    for(let k=0;k<5;k++){
+      const s=Math.min(1,max/Math.max(nw,nh)),cv=document.createElement('canvas');
+      cv.width=Math.max(2,Math.round(nw*s));cv.height=Math.max(2,Math.round(nh*s));
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      data=cv.toDataURL('image/png');
+      if(data.length<140000)break;max=Math.round(max*0.72);}
+    URL.revokeObjectURL(url);
+    state.logo=data;try{localStorage.setItem(LOGO_KEY,data);}catch(e){}
+    renderExport();toast('Logo dipasang — akan bergerak otomatis di setiap klip.');
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);toast('Berkas logo tidak bisa dibaca.');};
+  img.src=url;
+}
+
+/* ---------- persistensi ---------- */
+function save(){try{localStorage.setItem(KEY,JSON.stringify({v:1,
+  videoId:state.videoId,link:state.link,title:state.title,author:state.author,
+  duration:state.duration,params:state.params,
+  clips:state.clips.map(c=>({start:c.start,dur:c.dur,cap:c.cap===undefined?null:c.cap}))}));}catch(e){}}
+function restore(){
+  let d=null;try{d=JSON.parse(localStorage.getItem(KEY));}catch(e){}
+  if(!d||d.v!==1)return false;
+  try{
+    Object.assign(state,{videoId:d.videoId||null,link:d.link||'',title:d.title||'',author:d.author||'',
+      duration:d.duration||0,params:Object.assign({},DEFAULT_PARAMS,d.params||{})});
+    state.clips=(d.clips||[]).map(c=>({start:c.start|0,dur:c.dur|0,cap:c.cap===undefined?null:c.cap}));
+    $('#in-link').value=state.link;
+    $('#p-count').value=state.params.count;$('#p-dmin').value=state.params.durMin;$('#p-dmax').value=state.params.durMax;
+    $('#p-s0').value=state.params.skipStart;$('#p-s1').value=state.params.skipEnd;
+    $('#sel-crf').value=state.params.crf;$('#in-brand').value=state.params.brand;$('#in-tags').value=state.params.hashtags;
+    $$('#seg-mode button').forEach(b=>b.classList.toggle('on',b.dataset.mode===state.params.mode));
+    $$('#seg-fmt button').forEach(b=>b.classList.toggle('on',b.dataset.fmt===state.params.format));
+    $$('#seg-plat button').forEach(b=>b.classList.toggle('on',b.dataset.plat===state.params.platform));
+    $$('#seg-cam button').forEach(b=>b.classList.toggle('on',(b.dataset.cam==='1')===!!state.params.cam));
+    $$('#seg-zoom button').forEach(b=>b.classList.toggle('on',+b.dataset.z===+state.params.zoom));
+    $('#sel-sens').value=String(state.params.sens);
+    setFmtNote();setCamUI();syncFxUI();
+    if(state.videoId){showMain();fillMetaUI();
+      if(!ORIGIN_OK)blockPlayer();
+      if(yt){try{yt.cueVideoById(state.videoId);}catch(e){}}else pendingCue=state.videoId;}
+    if(state.duration&&state.clips.length){renderAll();return true;}
+    if(state.videoId){renderAll();return true;}
+  }catch(e){return false;}
+  return false;
+}
+
+/* ---------- pengait antarmuka ---------- */
+function setSeg(sel,attr,val){$$(sel+' button').forEach(b=>b.classList.toggle('on',String(b.dataset[attr])===String(val)));}
+function bindSeg(sel,attr,fn){$(sel).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  $$(sel+' button').forEach(x=>x.classList.remove('on'));b.classList.add('on');fn(b.dataset[attr]);});}
+function syncFxUI(){
+  const p=state.params;
+  $('#sel-font').value=p.font;
+  setSeg('#seg-title','tm',p.titleMode);setSeg('#seg-tdur','td',p.titleSec);
+  $('#in-titletxt').value=p.titleTxt||'';$('#in-titletxt').style.display=p.titleMode==='custom'?'block':'none';
+  setSeg('#seg-sub','sub',p.sub?1:0);$('#sel-sublang').value=p.subLang;
+  setSeg('#seg-substyle','ss',p.subStyle);setSeg('#seg-subpos','sp',p.subPos);
+  setSeg('#seg-logomove','lm',p.logoMove);setSeg('#seg-logosize','ls',p.logoSize);$('#sel-logoop').value=String(p.logoOp);
+}
+function setFmtNote(){
+  const map={blur:'9:16 · video di tengah, latar blur — paling aman untuk Shorts / Reels / TikTok.',
+             crop:'9:16 · potong tengah penuh — elemen di pinggir bisa terpotong.',
+             asli:'16:9 tanpa perubahan ukuran — untuk platform yang menerima lanskap.'};
+  $('#fmt-note').textContent=map[state.params.format];
+}
+function wire(){
+  $('#sel-font').innerHTML=FONTS.map(f=>'<option value="'+f.id+'">'+f.label+'</option>').join('');
+  $('#sel-font').addEventListener('change',e=>{state.params.font=e.target.value;renderExport();save();});
+  bindSeg('#seg-title','tm',v=>{state.params.titleMode=v;$('#in-titletxt').style.display=v==='custom'?'block':'none';renderExport();save();});
+  bindSeg('#seg-tdur','td',v=>{state.params.titleSec=+v;renderExport();save();});
+  $('#in-titletxt').addEventListener('input',debounce(e=>{state.params.titleTxt=e.target.value;renderExport();save();},300));
+  bindSeg('#seg-sub','sub',v=>{state.params.sub=v==='1';renderExport();save();});
+  $('#sel-sublang').addEventListener('change',e=>{state.params.subLang=e.target.value;renderExport();save();});
+  bindSeg('#seg-substyle','ss',v=>{state.params.subStyle=v;renderExport();save();});
+  bindSeg('#seg-subpos','sp',v=>{state.params.subPos=v;renderExport();save();});
+  bindSeg('#seg-logomove','lm',v=>{state.params.logoMove=v;renderExport();save();});
+  bindSeg('#seg-logosize','ls',v=>{state.params.logoSize=+v;renderExport();save();});
+  $('#sel-logoop').addEventListener('change',e=>{state.params.logoOp=+e.target.value;renderExport();save();});
+  $('#in-logo').addEventListener('change',e=>{loadLogo(e.target.files[0]);e.target.value='';});
+  $('#btn-logo-del').addEventListener('click',()=>{state.logo='';try{localStorage.removeItem(LOGO_KEY);}catch(e){}renderExport();toast('Logo dihapus.');});
+  $('#pm-retry').addEventListener('click',()=>{if(state.videoId&&yt){state.embedBlocked=false;startMetaPlayback(state.videoId);}});
+  $('#btn-dl-fx').addEventListener('click',()=>download('efek.py',fxSrc()));
+  $('#in-duration').addEventListener('input',e=>e.target.classList.remove('need'));
+  $('#btn-load').addEventListener('click',loadVideo);
+  $('#in-link').addEventListener('keydown',e=>{if(e.key==='Enter')loadVideo();});
+  $('#in-duration').addEventListener('change',e=>{
+    const v=parseInt(e.target.value,10);
+    if(v>0){state.duration=v;planClips();}});
+  const rePlan=debounce(()=>planClips(),260);
+  $('#p-count').addEventListener('change',e=>{state.params.count=clamp(parseInt(e.target.value,10)||20,5,60);e.target.value=state.params.count;rePlan();});
+  $('#p-dmin').addEventListener('change',e=>{state.params.durMin=clamp(parseInt(e.target.value,10)||30,5,600);rePlan();});
+  $('#p-dmax').addEventListener('change',e=>{state.params.durMax=clamp(parseInt(e.target.value,10)||45,5,600);rePlan();});
+  $('#p-s0').addEventListener('change',e=>{state.params.skipStart=clamp(parseInt(e.target.value,10)||0,0,7200);rePlan();});
+  $('#p-s1').addEventListener('change',e=>{state.params.skipEnd=clamp(parseInt(e.target.value,10)||0,0,7200);rePlan();});
+  $('#seg-mode').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    $$('#seg-mode button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    state.params.mode=b.dataset.mode;planClips();});
+  $('#seg-fmt').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    $$('#seg-fmt button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    state.params.format=b.dataset.fmt;setFmtNote();renderExport();save();});
+  $('#seg-plat').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    $$('#seg-plat button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    state.params.platform=b.dataset.plat;renderExport();save();});
+  $('#seg-cam').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    $$('#seg-cam button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    state.params.cam=b.dataset.cam==='1';setCamUI();renderExport();save();});
+  $('#seg-zoom').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    $$('#seg-zoom button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+    state.params.zoom=+b.dataset.z;renderExport();save();});
+  $('#sel-sens').addEventListener('change',e=>{state.params.sens=+e.target.value;renderExport();save();});
+  $('#btn-dice').addEventListener('click',()=>{
+    state.params.seed=(Math.random()*1e9)|0;planClips();toast('Susunan acak baru dibuat.');});
+  $('#btn-replan').addEventListener('click',()=>{planClips();toast('Rencana disusun ulang.');});
+  $('#sel-crf').addEventListener('change',e=>{state.params.crf=+e.target.value;renderExport();save();});
+  const reMeta=debounce(()=>{renderList();renderExport();save();},300);
+  $('#in-brand').addEventListener('input',e=>{state.params.brand=e.target.value;reMeta();});
+  $('#in-tags').addEventListener('input',e=>{state.params.hashtags=e.target.value;reMeta();});
+  $('#btn-loop').addEventListener('click',()=>{
+    state.loop=!state.loop;
+    const b=$('#btn-loop');b.classList.toggle('off',!state.loop);
+    b.textContent='PUTAR ULANG KLIP: '+(state.loop?'AKTIF':'MATI');});
+  /* cutting list — delegasi */
+  $('#cliplist').addEventListener('click',e=>{
+    const row=e.target.closest('.clip-row');if(!row)return;
+    const i=+row.dataset.i,btn=e.target.closest('[data-act]');
+    if(!btn){previewClip(i,true);return;}
+    const act=btn.dataset.act;
+    if(act==='play')previewClip(i,true);
+    else if(act==='copy')copyText('# '+fileName(i)+'.mp4 — potongan '+(i+1)+'/'+state.clips.length+' ('+fmtTC(state.clips[i].start)+' → '+fmtTC(state.clips[i].start+state.clips[i].dur)+')\n'+(state.params.cam?'# butuh zoomwajah.py di folder yang sama (tombol unduh di atas); judul, subtitle & logo hanya ada di script lengkap\n':'')+clipCmd(i,true))
+      .then(ok=>toast(ok?'Perintah klip '+(i+1)+' disalin.':'Gagal menyalin — salin manual dari script.'));
+    else if(act==='n')nudge(i,+btn.dataset.d);
+  });
+  $('#cliplist').addEventListener('input',e=>{
+    if(e.target.classList.contains('cap-input')){
+      const i=+e.target.dataset.i;state.clips[i].cap=e.target.value;save();}});
+  /* ekspor */
+  $('#btn-copyall').addEventListener('click',()=>copyText(buildScript()).then(ok=>toast(ok?'Script lengkap disalin — tempel di Termux / iSH / terminal.':'Gagal menyalin.')));
+  $('#btn-exp-copy').addEventListener('click',()=>copyText(buildScript()).then(ok=>toast(ok?'Script lengkap disalin.':'Gagal menyalin.')));
+  const dlSh=()=>{if(!state.clips.length){toast('Belum ada potongan untuk diekspor.');return;}download('potong20.sh',buildScript());};
+  $('#btn-dl-sh').addEventListener('click',dlSh);
+  $('#btn-exp-dl').addEventListener('click',dlSh);
+  const dlPy=()=>download('zoomwajah.py',pySrc());
+  $('#btn-dl-py').addEventListener('click',dlPy);
+  $('#btn-exp-py').addEventListener('click',dlPy);
+  $('#btn-dl-cap').addEventListener('click',()=>{if(!state.clips.length){toast('Belum ada caption.');return;}download('captions.txt',buildCaptions());});
+  $('#btn-dl-json').addEventListener('click',()=>{if(!state.clips.length){toast('Belum ada cutlist.');return;}download('cutlist.json',buildJSON());});
+  /* reset dua-tahap (tanpa dialog bawaan peramban) */
+  $('#btn-reset').addEventListener('click',()=>{
+    const b=$('#btn-reset');
+    if(!b.classList.contains('arm')){b.classList.add('arm');$('#reset-lbl').textContent='YAKIN?';
+      setTimeout(()=>{b.classList.remove('arm');$('#reset-lbl').textContent='RESET';},3000);return;}
+    localStorage.removeItem(KEY);try{localStorage.removeItem(LOGO_KEY);}catch(e){}location.reload();});
+}
+
+/* ---------- start ---------- */
+document.addEventListener('DOMContentLoaded',()=>{
+  try{state.logo=localStorage.getItem(LOGO_KEY)||'';}catch(e){}
+  wire();icons();setCamUI();syncFxUI();requestAnimationFrame(fxTick);
+  if(window.YT&&YT.Player){ytReady=true;initPlayer();}
+  else if(ORIGIN_OK){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{};document.head.appendChild(s);}
+  $('#in-tags').value=state.params.hashtags;
+  if(!restore()){$('#in-tags').value=state.params.hashtags;}
+  /* fallback bila API YouTube tidak kunjung hadir (jaringan diblokir dsb.) */
+  fxRender();
+  setTimeout(()=>{if(!ytReady&&ORIGIN_OK&&state.videoId){state.embedBlocked=true;const m=embedMsg();showPlayerMsg(m[0],m[1]);}},7000);
+});
+</script>
+</body>
+</html>
